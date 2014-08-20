@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>LearningStudio Grades Library in PHP</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+		<link href='http://fonts.googleapis.com/css?family=Raleway:500,700|Roboto:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="../assets/css/normalize.css">
+        <link rel="stylesheet" href="../assets/css/main.css">
+        <link rel="stylesheet" href="../assets/css/prism.css">
+        <script src="../assets/js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+	<div id="MastBar">
+		<div id="TopColorbar"> </div>
+		<div id="TitleBar">
+			<div>
+				<a href="http://pdn.pearson.com" target="_blank" title="Home"><img src="../assets/pdn-header-sm.PNG" /></a>
+				<a href="http://pdn.pearson.com" target="_blank">pdn.pearson.com</a>
+			</div>
+		</div>
+	</div>
+		
+	<article> 
+		<h1>Grades</h1>
+		<blockquote>
+			<h3>Documentation</h3>
+			<p>The complete documentation for the Grades APIs is <a href="http://pdn.pearson.com/apis/grades-learningstudio">available here</a>.</p>
+		</blockquote>
+		<blockquote>
+			<h3>API Keys</h3>
+			<p>You will need keys to work with the APIs.</p>
+			<ul>
+				<li><b>Application ID</b>: Identifies your Application for analytics and quota limits.</li> 
+				<li><b>Campus Keys</b>: A <i>Token Key Moniker (TKM)</i>, <i>Shared Secret</i>, and <i>Client String</i> identifies the LearningStudio campus where your data comes from.</li>
+			</ul>
+			<p>You can get an Application ID for your app and campus keys for our Sandbox Campus by creating an app on the PDN. <a href="http://pdn.pearson.com/learningstudio/get-a-key">Learn more here</a>.
+		</blockquote>
+		<blockquote>
+			<h3>Supported Formats</h3>
+			<p>This library only supports JSON-formatted requests.</p>
+		</blockquote>
+		<blockquote>
+			<h3>Identifier Parameter Types</h3>
+			<p>Except where specified, all parameters types are strings including identifiers like Course ID, User ID, etc.</p>
+		</blockquote>
+		
+		<h4>Contents</h4>
+		<ul>
+			<li><a href="#Introduction">Introduction</a></li>
+			<li><a href="#Usage">Using Grades</a>
+				<ul>
+					<li><a href="#Start">Get Started - Instantiating the Object</a></li>
+					<li><a href="#Methods">Available Methods</a>
+						<ul>
+							<li><a href="#GradebookStructure">Gradebook Structure</a></li>
+							<li><a href="#Custom">Custom Categories & Items</a></li>
+							<li><a href="#IndividualGrades">Individual Item Grades</a></li>
+							<li><a href="#CourseGrades">Course Grades</a></li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		
+		<a name="Introduction"></a>
+		<h2>Introduction</h2>
+		<p>The Grades library facilitates working with our Grades APIs for LearningStudio. This is one of our most commonly used APIs, because customers need to retrieve or post grades from outside LearningStudio, and third parties need to send grades into LearningStudio.</p>
+		<p>This library provides a PHP-specific method for each of the Grades API endpoints. Note that the library speaks in JSON, so you will provide JSON payloads to POST and PUT requests, and receive responses as JSON-formatted strings. The parameters of the method are the values that would be inserted into the endpoint, for example, <code>/users/<b>{userId}</b>/courses</code>. The complete documentation for each method is linked in the Methods section, below.</p> 
+		 <p>There is one composite method that combines multiple API calls into one method, making it easier to create a custom gradebook category and related item.</p> 
+		<hr>
+		
+		<a name="Usage"></a>
+		<h2>Using Grades</h2> 
+		
+		
+		<a name="Start"></a>
+		<h3>Instantiating the Library</h3>
+		
+		<h4>Setup</h4>
+		<p>To begin, include the <code>learningstudio-init.php</code> file to your script to handle class autoloading, and use the <code>use</code> operator for the classes you'll be instantiating.</p>
+		<pre><code class="language-php">include('path/to/library/learningstudio-init.php');
+
+use Auth\Config\OAuthConfig;
+use Auth\OAuthServiceFactory;
+use Grade\GradeService;</code></pre>
+
+		<h4>Authentication</h4>
+		<p>You'll need to provide your authentication details (keys, client string, etc) so the Core library can handle authentication. The <code>OAuthConfig</code> class is a generic carrier for the configuration information for all authentication methods. You'll add the information you need using the following methods.</p> 
+		<pre><code class="language-php">$config = new OAuthConfig();
+$config->setApplicationId( $ApplicationID );
+$config->setApplicationName( $ApplicationName );
+$config->setTokenKeyMoniker( $TokenKeyMoniker );
+$config->setSharedSecret( $SharedSecret );
+$config->setClientString( $ClientString );</code></pre>
+		<p>There are differences in what values are needed between the different OAuth methods. Generally, adding all five pieces of information is most flexible, but you can leave out the pieces you don't need. For example, if using OAuth 1 only (System to System calls), you don't need the Application Name or Client String.</p>
+			<p>The <code>OAuthServiceFactory</code> object instantiates the appropriate service for the authentication method you want to use. When using core, you only need to create the Factory and pass it to the Core library.</p> 
+		<pre><code class="language-php">$oauthFactory = new OAuthServiceFactory( $config );</code></pre>
+		
+		<h4>Requests</h4>
+		
+		<p>Next, you'll instantiate the <code>GradeService</code> class, which handles all the work of making an API call and provides PHP-specific methods for the Grades API. When creating the object, pass the OAuth Factory as the only parameter:</p>
+
+		<pre><code class="language-php">$GradeService = new GradeService( $oauthFactory );</code></pre>
+		
+		<p>Before making an API call, set the service to the OAuth method you'll use. If using OAuth 2 for a user token, pass the user's username, and if using Password grant type, also send the password. </p> 
+		
+		<pre><code class="language-php">// OAuth 1
+$GradeService->useOAuth1();
+
+//OAuth 2 Assertion Grant Type
+$GradeService->useOAuth2( $UserName );
+
+//OAuth 2 Assertion Grant Type
+$GradeService->useOAuth2( $UserName, $Password );</code></pre>
+
+		<p>Finally, use the methods detailed below to make requests.</p>
+		
+		<h4>Results</h4>
+		<p>All of the Grades methods will return a <code>Response</code> object. This object has these methods:</p>
+		<table> 
+			<tr>
+				<th>Method</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code>getContentType()</code></td>
+				<td>Returns the type of response, either <code>json</code> or <code>xml</code> if it's text-based, or the MIME type of the content if binary content.</td>
+			</tr>
+			<tr>
+				<td><code>getContent()</code></td>
+				<td>Returns the text-based body of the response from the API. It is returned as a string of either JSON or XML, and is not parsed into a native object.</td>
+			</tr>
+			<!-- <tr>
+				<td><code>getBinaryContent()</code></td>
+				<td>Returns the binary-based body of the response from the API, if <code>isBinaryContent()</code> returns <code>true</code>.</td>
+			</tr>
+			<tr>
+				<td><code>isBinaryContent()</code></td>
+				<td>Returns either <code>true</code> or <code>false</code> as to whether the body of the API response is binary data (for example, if downloading a document or threaded discussion attachment).</td>
+			</tr> -->
+			<tr>
+				<th class="middle" colspan="2">About the API Request</th>
+			</tr>
+			
+			<tr>
+				<td><code>getHeaders()</code></td>
+				<td>Returns the headers used in the request.</td>
+			</tr>
+			<tr>
+				<td><code>getMethod()</code></td>
+				<td>Returns the HTTP method that was used.</td>
+			</tr>
+			<tr>
+				<td><code>getStatusCode()</code></td>
+				<td>Returns the HTTP Status Code from the API request. Example:<code>200</code>, <code>201</code>, <code>400</code>, etc. </td>
+			</tr>
+			<tr>
+				<td><code>getStatusMessage()</code></td>
+				<td>Returns the HTTP Status message from the API request. Example:<code>Created</code> or <code>Not Found</code>. </td>
+			</tr>
+			<tr>
+				<td><code>getUrl()</code></td>
+				<td>Returns the URL that was called to make the request.</td>
+			</tr>
+			<tr>
+				<td><code>isError()</code></td>
+				<td>Returns either <code>true</code> or <code>false</code> as to whether there was a problem with the API request.</td>
+			</tr>
+		</table>
+		
+		<h4>Example</h4>
+		<pre class="line-numbers"><code class="language-php">include('path/to/library/learningstudio-init.php');
+
+use Auth\Config\OAuthConfig;
+use Auth\OAuthServiceFactory; 
+use Grade\GradeService; 
+
+$ApplicationID   = "";   // Identifies your Application
+$ApplicationName = "";   // No spaces for best results (e.g., MyAppName)
+$TokenKeyMoniker = "";   
+$SharedSecret    = "";   
+$ClientString    = "";   
+
+$UserName        = ""; 
+
+
+$config = new OAuthConfig();
+$config->setApplicationId( $ApplicationID );
+$config->setApplicationName( $ApplicationName );  // Needed only for OAuth 2 Assertion 
+$config->setTokenKeyMoniker( $TokenKeyMoniker );
+$config->setSharedSecret( $SharedSecret );        // Needed only for OAuth 1 &amp; OAuth 2 Assertion 
+$config->setClientString( $ClientString );	      // Needed only for OAuth 2
+
+$oauthFactory = new OAuthServiceFactory( $config );
+
+$GradeService = new GradeService( $oauthFactory );
+
+$GradeService->useOAuth2( $UserName ); 
+
+try{ 
+	
+	$LSResponse = $GradeService->getTotalPointsAvailable ($userId, $courseId ); 
+	
+} catch(Exception $e){ 
+	// process exception
+	exit; 
+} 
+
+if( !$LSResponse->isError() ){ 
+			
+	$StringBody = $LSResponse->getContent(); 
+	
+	if($LSResponse->getContentType() == 'json'){ 
+		
+		$Body = json_decode( $StringBody ); 
+		
+	} 
+}</code></pre>
+
+	<hr>
+	
+	<a name="Methods"></a>
+	<h3>Available Methods</h3>
+	
+		<blockquote>
+			<h3>Identifier Overloads</h3>
+			<p>Wherever you need to pass a user ID or a course ID, you can also use username and call number overloads. For example, either of these requests would work:</p>
+			<p><code>getCurrentGrade ( '12345678', '987654321' );</code></p>
+			<p><code>getCurrentGrade ( 'loginid={CLIENT_STRING}|{USERNAME}', 'ccn={CALL_NUMBER}' );</code></p>
+		</blockquote>
+		
+		
+	<a name="GradebookStructure"></a>
+	<h4>Gradebook Structure</h4>
+	
+	<p>A Gradebook Item is the association of a category with a unit. Normal gradebook items, those associated with course content, can only be created using the LearningStudio user interface. But you can update details such as the points possible using the APIs.</p>
+	<br>
+	
+	<pre><code class="language-php">getGradebookItems ($courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+	<li>Returns all the gradebook items for a course.</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-gradebook-items-course_x#responsebody">Sample Response Body in the API Documentation</a></li>
+	</ul>
+	
+	<br>
+	<pre><code class="language-php">getGradebookItem ($courseId, $gradebookItemId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+	<li>Returns a specific gradebook item in a course.</li>
+	<li>You'll need the Gradebook Item ID, which looks like a GUID (e.g., 12ea8161-3062-4e9c-b231-364dec307687).</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-gradebook-items-course_x#example2">Sample Request with Response Body in the API Documentation</a></li>
+	</ul>
+	
+	<br>
+	<pre><code class="language-php">updateGradebookItem ($courseId, $gradebookItemId, $gradebookItem)</code></pre>
+	<ul>
+	<li>Updates the details like points possible, whether to include the item in the course grade, or whether the item is extra credit.</li>
+	<li><code>$gradebookItem</code> is the JSON-formatted payload to send to the API.</li>
+	<li>On completion, there is no response body. HTTP Code 204 indicates a successful update.</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-gradebook-items-course_x#example3">Sample Request in the API Documentation</a></li>
+	</ul>
+	
+	<br>
+	<pre><code class="language-php">getCourseGradebookUserItems ($userId, $courseId)</code></pre>
+	<ul>
+	<li>Returns the gradebook items from a course that the user is able to see or that the user will receive grades for. (Some courses may set up their gradebooks such that different items apply to different groups of students.)</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-gradebook-items-for-course-by-user_x">API Documentation</a></li>
+	</ul>
+
+	<br>
+	<pre><code class="language-php">getCourseGradebookUserItem ($userId, $courseId, $userGradebookItemId [, $expandGrade ])</code></pre>
+	<ul>
+	<li>Returns a specific gradebook item from a course for a given user.</li>
+	<li>The User Gradebook Item ID will be a concatenated string of their user ID and a GUID  (e.g., 12345678-12ea8161-3062-4e9c-b231-364dec307687)</li>
+	<li><code>$expandGrade</code> is optional. If <code>true</code>, the response body will include the user's grade. Otherwise you'd need to retrieve their grade using the <code>getGrade()</code> method (below)</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-gradebook-items-for-course-by-user_x">API Documentation</a></li>
+	</ul>
+
+
+	<br>
+	<a name="Custom"></a>
+	<h4>Custom Categories &amp; Items</h4> 
+	
+	<p>Normal gradebook items (previous section) are associated with content items in the course. 
+		Custom Gradebook Categories allow a course to grade things that don't appear in the content structure, 
+		like "attendance" or "participation." Third party software can use Custom Categories for the grades they 
+		send back to the gradebook, as well.</p>
+	<p>To create custom gradebook entries, you need to first create the Custom Category (which is essentially 
+		just a string for the category name). Then you create a Custom Item by associating the Custom Category with a
+		Unit ID (you can get Unit IDs from the Content Structure APIs; <i>hint:</i> Unit IDs always start with "200..."). 
+		This association creates a gradable item where a grade can be posted.</p>
+	
+	<br><pre><code class="language-php">createCustomGradebookCategoryAndItem ($courseId, $customCategory, $customItem)</code></pre>
+	<ul>
+	<li>This is a composite method that facilitates creating a custom category and item in one request. It combines <code>createCustomGradebookCategory()</code> and <code>createCustomGradebookItem</code>.</li>
+	<li><code>$customCategory</code> and <code>$customItem</code> are the respective JSON-formatted payloads to send to the APIs. </li>
+	<li>The response will be a standard <code>Response</code> object. The content from both API calls is combined to a JSON object with two keys: <code>customCategory</code> and <code>customItem</code>.</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-categories-course_x">Custom Categories API Documentation</a></li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-items-for-custom-gradebook-categories_x">Custom Items API Documentation</a></li>
+	</ul>
+
+	<br><pre><code class="language-php">getCustomGradebookCategories ($courseId )</code></pre>
+	<ul>
+	<li>Returns all the custom categories in a course.</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-categories-course_x">API Documentation</a></li>
+	</ul>
+
+	<br><pre><code class="language-php">getCustomGradebookCategory ($courseId, $customCategoryId)</code></pre>
+	<ul>
+	<li>Returns the detail for a custom category.</li>
+	<li><code>$customCategoryId</code> is a GUID for the category.</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-categories-course_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">createCustomGradebookCategory ($courseId, $customCategory)</code></pre>
+	<ul>
+	<li>Creates a custom category in the gradebook. Note that category titles must be unique, and this request will respond with an error if you try to duplicate a category title.</li>
+	<li><code>$customCategory</code> is the JSON-formatted payload to send to the API. </li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-categories-course_x#example2">Sample Request and Payload in the API Documentation</a></li>
+	</ul>
+
+	<br><pre><code class="language-php">updateCustomGradebookCategory ($courseId, $customCategoryId, $customCategory)</code></pre>
+	<ul>
+	<li>Update a custom category in the gradebook. You can change the title (as long as it's still unique) and change whether the category can be assigned.</li>
+	<li><code>$customCategoryId</code> is a GUID for the category.</li>
+	<li><code>$customCategory</code> is the JSON-formatted payload to send to the API. </li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-categories-course_x#example4">Sample Request and Payload in the API Documentation</a></li>
+	</ul>
+
+	<br><pre><code class="language-php">deleteCustomGradebookCategory ($courseId, $customCategoryId)</code></pre>
+	<ul>
+	<li>Delete a custom category from the gradebook.</li>
+	<li><code>$customCategoryId</code> is a GUID for the category.</li>
+	<li>On successful deletion, there is no response body; HTTP Status Code 204 signifies a successful deletion.</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-categories-course_x">API Documentation</a></li>
+	</ul>
+
+
+	<br><pre><code class="language-php">getGradebookCustomItems ($courseId, $customCategoryId )</code></pre>
+	<ul>
+	<li>Returns all the custom gradebook items for a specified custom category.</li>
+	<li><code>$customCategoryId</code> is a GUID for the category.</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-items-for-custom-gradebook-categories_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getGradebookCustomItem ($courseId, $customCategoryId, $customItemId)</code></pre>
+	<ul>
+	<li>Returns the detail for a custom item.</li>
+	<li><code>$customCategoryId</code> is a GUID for the category.</li>
+	<li><code>$customItemId</code> is a GUID for the custom item.</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-items-for-custom-gradebook-categories_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">createCustomGradebookItem ($courseId, $customCategoryId, $customItem)</code></pre>
+	<ul>
+	<li>Creates a Custom Item for a Custom Category. This is the work of associating a category with a Unit to create a Gradable Item.</li>
+	<li><code>$customCategoryId</code> is a GUID for the category.</li>
+	<li><code>$customItem</code> is the JSON-formatted payload to send to the API. The Unit ID is sent in this payload. You can get the Unit ID from the Content Structure APIs (hint, Unit IDs always start with "200").</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-items-for-custom-gradebook-categories_x#example3">Sample Request and Payload in the API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">deleteCustomGradebookItem ($courseId, $customCategoryId, $customItemId)</code></pre>
+	<ul>
+	<li>Deletes a Custom Item from the Gradebook.</li>
+	<li><code>$customCategoryId</code> is a GUID for the category.</li>
+	<li><code>$customItemId</code> is a GUID for the custom item.</li>
+	<li>On successful deletion, there is no response body; HTTP Status Code 204 signifies a successful deletion.</li>
+	<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-custom-items-for-custom-gradebook-categories_x#example4">Sample Request in the API Documentation</a></li>
+	</ul>
+
+	
+	<br>
+	<a name="IndividualGrades"></a>
+	<h4>Individual Item Grades</h4>
+	<p>Grades can be saved for Gradable Items. A Gradable Item is always tied to a content item, or to a custom category.</p>
+	
+	<br><pre><code class="language-php">createGrade ($userId, $courseId, $gradebookItemId, $grade)</code></pre>
+	<ul>
+		<li>Creates a new grade for a gradable item (grade should not already exist).</li>
+		<li><code>$grade</code> is the JSON-formatted payload to send to the API.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-grades-for-gradebook-item-by-user_x#example3">Sample Request and Payload in the API Documentation</a></li>
+	</ul>
+	<br><pre><code class="language-php">updateGrade ($userId, $courseId, $gradebookItemId, $grade)</code></pre>
+	<ul>
+		<li>Updates an existing grade.</li>
+		<li><code>$grade</code> is the JSON-formatted payload to send to the API.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-grades-for-gradebook-item-by-user_x#example4">Sample Request and Payload in the API Documentation</a></li>
+	</ul>
+	<br><pre><code class="language-php">deleteGrade ($userId, $courseId, $gradebookItemId)</code></pre>
+	<ul>
+		<li>Deletes a grade.</li>
+		<li>On successful deletion, there is no response body; HTTP Status Code 204 signifies a successful deletion.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-grades-for-gradebook-item-by-user_x#example5">Sample Request in the API Documentation</a></li>
+	</ul>
+
+	<br><pre><code class="language-php">getGrades ($userId, $courseId [, $useSourceDomain ] )</code></pre>
+	<ul>
+		<li>This is a composite function that returns all of a user's grades in a course.</li>
+		<li>Only returns actual grades awarded; if a gradebook item does not have a grade for the user, there's no indication of that here.</li>
+		<li><code>$useSourceDomain</code> is optional; if <code>true</code>, any URLs in the content of grade detail (e.g., links to images hosted in LearningStudio) will be prepended with a hostname. Grades rarely need this feature.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-grades-for-gradebook-item-by-user_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getGrade ($userId, $courseId, $gradebookItemId [, $useSourceDomain ] )</code></pre>
+	<ul>
+		<li>Returns the user's grade for a given Gradable Item.</li>
+		<li><code>$useSourceDomain</code> is optional; if <code>true</code>, any URLs in the content of grade detail (e.g., links to images hosted in LearningStudio) will be prepended with a hostname. Grades rarely need this feature.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-grades-for-gradebook-item-by-user_x">API Documentation</a></li>
+	</ul>
+	
+	<br>
+	<a name="CourseGrades"></a>
+	<h4>Course Grades</h4>
+	<p>These are roll-up APIs that calculate the aggregate, total grade for a course (i.e., grade to date).</p>
+	
+	<br><pre><code class="language-php">getCurrentGrade ($userId, $courseId)</code></pre>
+	<ul>
+		<li>Returns a single user's grade to date in the course.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-course-grade-to-date-by-user_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getCurrentGrades ($courseId [, $studentIds [, $offset [, $limit ]]] )</code></pre>
+	<ul>
+		<li>Returns the current grades to date for all users in the course.</li>
+		<li>You can request the grades to date for specific users by sending the User IDs in the <code>$studentIds</code> parameter. The IDs should be separated by commas; you must use IDs, this feature does not accept username overloads. If using pagination and <i>not</i> student IDs, set this to <code>NULL</code>.</li>
+		<li>The API only returns up to 30 students at a time, so if there are more students, use the <code>$offset</code> and <code>$limit</code> parameters to paginate.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-roster-course-grade-to-date_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getTotalPointsAvailable ($userId, $courseId)</code></pre>
+	<ul>
+		<li>Returns the total points possible for the given user in the given course.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/grades/grades-resources/uri-total-points-for-course-gradebook-by-user_x">API Documentation</a></li>
+	</ul>
+		
+	</article> 	
+	<footer>
+		&copy;2014 Pearson Education Inc. Libraries released under the <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache 2.0 License</a>. For help with these libraries or the APIs, please use the <a href="https://community.pdn.pearson.com" target="_blank">PDN Developer Community</a>.
+	</footer>
+        <script src="../assets/js/prism.js"></script>
+
+    </body>
+</html>

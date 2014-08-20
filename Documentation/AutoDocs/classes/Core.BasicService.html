@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>Learning Studio</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <![endif]-->
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">Learning Studio</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/Auth.html">\Auth</a></li>
+                                                        <li><a href="../namespaces/Content.html">\Content</a></li>
+                                                        <li><a href="../namespaces/Core.html">\Core</a></li>
+                                                        <li><a href="../namespaces/Exams.html">\Exams</a></li>
+                                                        <li><a href="../namespaces/Grade.html">\Grade</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">183</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">1</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-999837985"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-999837985" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-408183782"></a>
+                                <a href="../namespaces/Auth.html" style="margin-left: 30px; padding-left: 0">Auth</a>
+            </div>
+            <div id="namespace-408183782" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1758820757"></a>
+                                <a href="../namespaces/Auth.Config.html" style="margin-left: 30px; padding-left: 0">Config</a>
+            </div>
+            <div id="namespace-1758820757" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Auth.Config.OAuth1SignatureConfig.html">OAuth1SignatureConfig</a></li>
+                                                    <li class="class"><a href="../classes/Auth.Config.OAuth2AssertionConfig.html">OAuth2AssertionConfig</a></li>
+                                                    <li class="class"><a href="../classes/Auth.Config.OAuth2PasswordConfig.html">OAuth2PasswordConfig</a></li>
+                                                    <li class="class"><a href="../classes/Auth.Config.OAuthConfig.html">OAuthConfig</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1181568685"></a>
+                                <a href="../namespaces/Auth.Request.html" style="margin-left: 30px; padding-left: 0">Request</a>
+            </div>
+            <div id="namespace-1181568685" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Auth.Request.OAuth1Request.html">OAuth1Request</a></li>
+                                                    <li class="class"><a href="../classes/Auth.Request.OAuth2Request.html">OAuth2Request</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Auth.OAuth1SignatureService.html">OAuth1SignatureService</a></li>
+                                                    <li class="class"><a href="../classes/Auth.OAuth2AssertionService.html">OAuth2AssertionService</a></li>
+                                                    <li class="class"><a href="../classes/Auth.OAuth2PasswordService.html">OAuth2PasswordService</a></li>
+                                                    <li class="class"><a href="../classes/Auth.OAuthServiceFactory.html">OAuthServiceFactory</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-945308988"></a>
+                                <a href="../namespaces/Content.html" style="margin-left: 30px; padding-left: 0">Content</a>
+            </div>
+            <div id="namespace-945308988" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Content.ContentService.html">ContentService</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1869705029"></a>
+                                <a href="../namespaces/Core.html" style="margin-left: 30px; padding-left: 0">Core</a>
+            </div>
+            <div id="namespace-1869705029" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Core.AbstractService.html">AbstractService</a></li>
+                                                    <li class="class"><a href="../classes/Core.BasicService.html">BasicService</a></li>
+                                                    <li class="class"><a href="../classes/Core.Response.html">Response</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-627196200"></a>
+                                <a href="../namespaces/Exams.html" style="margin-left: 30px; padding-left: 0">Exams</a>
+            </div>
+            <div id="namespace-627196200" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Exams.ExamService.html">ExamService</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-72443683"></a>
+                                <a href="../namespaces/Grade.html" style="margin-left: 30px; padding-left: 0">Grade</a>
+            </div>
+            <div id="namespace-72443683" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Grade.GradeService.html">GradeService</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/Core.html">\Core</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\Core</small>BasicService</h1>
+                    <p><em>Core Service API
+An implementation of CoreService for handling all requests and responses.</em></p>
+                    
+
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/Core.BasicService.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method_getAuth" class="">getAuth()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method__doGet" class="">_doGet()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method__doPost" class="">_doPost()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method__doPut" class="">_doPut()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method__doDelete" class="">_doDelete()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method__doMethod" class="">_doMethod()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method_getSystemDateTime" class="">getSystemDateTime()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method_getSystemDateTimeMillis" class="">getSystemDateTimeMillis()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method_getOAuthHeaders" class="">getOAuthHeaders()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method_getPreferredFormat" class="">getPreferredFormat()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method_setPreferredFormat" class="">setPreferredFormat()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method_useOAuth1" class="">useOAuth1()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method_useOAuth2" class="">useOAuth2()</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#method_destroy" class="">destroy()</a><br />
+                                                                    <a href="../classes/Core.BasicService.html#method_doMethod" class="">doMethod()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Core.AbstractService.html#property__uri" class="">$_uri</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#property_oauthServiceFactory" class="">$oauthServiceFactory</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#property_oauthHeaders" class="">$oauthHeaders</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#property_dataFormat" class="">$dataFormat</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#property_dateFormat" class="">$dateFormat</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <a href="../classes/Core.BasicService.html#method_getServiceIdentifier" class="">getServiceIdentifier()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Core.AbstractService.html#property__auth" class="">$_auth</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Core.AbstractService.html#property_PATH_SYSTEMDATETIME" class="">$PATH_SYSTEMDATETIME</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#property_authMethod" class="">$authMethod</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#property_username" class="">$username</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#property_password" class="">$password</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#property_currentOAuthRequest" class="">$currentOAuthRequest</a><br />
+                                                                    <a href="../classes/Core.AbstractService.html#property_oauthRequest" class="">$oauthRequest</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/Core.BasicService.html"><div class="path-wrapper">Core/BasicService.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">\: Core</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                
+                                        <div class="namespace-wrapper"><a href="../classes/Core.AbstractService.html">\Core\AbstractService</a></div>
+                                                                                                    <div class="namespace-wrapper">\Core\BasicService</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>: Pradeep Patro <a href="mailto:pradeep.patro@happiestminds.com">pradeep.patro@happiestminds.com</a></p>
+                                                            </td>
+                        </tr>
+                                            <tr>
+                            <th>
+                                version
+                            </th>
+                            <td>
+                                                                    <p>: v1.0</p>
+                                                            </td>
+                        </tr>
+                                            <tr>
+                            <th>
+                                copyright
+                            </th>
+                            <td>
+                                                                    <p>: Pearson 2014</p>
+                                                            </td>
+                        </tr>
+                                            <tr>
+                            <th>
+                                since
+                            </th>
+                            <td>
+                                                                    <p>: 4th Jun 2014</p>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__uri" name="property__uri" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$_uri</h3>
+                <pre class="signature">$_uri : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_oauthServiceFactory" name="property_oauthServiceFactory" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$oauthServiceFactory</h3>
+                <pre class="signature">$oauthServiceFactory : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_oauthHeaders" name="property_oauthHeaders" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$oauthHeaders</h3>
+                <pre class="signature">$oauthHeaders : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_dataFormat" name="property_dataFormat" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$dataFormat</h3>
+                <pre class="signature">$dataFormat : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_dateFormat" name="property_dateFormat" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$dateFormat</h3>
+                <pre class="signature">$dateFormat : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property__auth" name="property__auth" class="anchor"></a>
+            <article class="property">
+                <h3 class="protected ">$_auth</h3>
+                <pre class="signature">$_auth : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_PATH_SYSTEMDATETIME" name="property_PATH_SYSTEMDATETIME" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$PATH_SYSTEMDATETIME</h3>
+                <pre class="signature">$PATH_SYSTEMDATETIME : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_authMethod" name="property_authMethod" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$authMethod</h3>
+                <pre class="signature">$authMethod : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_username" name="property_username" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$username</h3>
+                <pre class="signature">$username : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_password" name="property_password" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$password</h3>
+                <pre class="signature">$password : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_currentOAuthRequest" name="property_currentOAuthRequest" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$currentOAuthRequest</h3>
+                <pre class="signature">$currentOAuthRequest : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_oauthRequest" name="property_oauthRequest" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$oauthRequest</h3>
+                <pre class="signature">$oauthRequest : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct(object <span class="argument">$oauthServiceFactory</span>) : null</pre>
+                <p><em>Constructor for CoreService</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>object</td>
+                                <td>$oauthServiceFactory </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    null
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getAuth" name="method_getAuth" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getAuth()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getAuth() : object</pre>
+                <p><em>Return the Currernt Authenticaion</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    object
+                                            &mdash; <p>$this->_auth Returns current authentication</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__doGet" name="method__doGet" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">_doGet()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_doGet(string <span class="argument">$relativeUrl</span>, string|null <span class="argument">$body</span>, array|null <span class="argument">$extraHeaders</span>) : object</pre>
+                <p><em>GET Method</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$relativeUrl </td>
+                                <td><p>request url</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$body </td>
+                                <td><p>body for the request</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|null</td>
+                                <td>$extraHeaders </td>
+                                <td><p>Extra headers for request</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    object
+                                            &mdash; <p>$response Response class object with details of status and content.</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__doPost" name="method__doPost" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">_doPost()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_doPost(string <span class="argument">$relativeUrl</span>, string|null <span class="argument">$body</span>, array|null <span class="argument">$extraHeaders</span>) : object</pre>
+                <p><em>POST Method</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$relativeUrl </td>
+                                <td><p>request url</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$body </td>
+                                <td><p>body for the request</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|null</td>
+                                <td>$extraHeaders </td>
+                                <td><p>Extra headers for request</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    object
+                                            &mdash; <p>$response Response class object with details of status and content.</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__doPut" name="method__doPut" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">_doPut()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_doPut(string <span class="argument">$relativeUrl</span>, string|null <span class="argument">$body</span>, array|null <span class="argument">$extraHeaders</span>) : object</pre>
+                <p><em>PUT Method</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$relativeUrl </td>
+                                <td><p>request url</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$body </td>
+                                <td><p>body for the request</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|null</td>
+                                <td>$extraHeaders </td>
+                                <td><p>Extra headers for request</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    object
+                                            &mdash; <p>$response Response class object with details of status and content.</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__doDelete" name="method__doDelete" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">_doDelete()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_doDelete(string <span class="argument">$relativeUrl</span>, string|null <span class="argument">$body</span>, array|null <span class="argument">$extraHeaders</span>) : object</pre>
+                <p><em>DELTE Method</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$relativeUrl </td>
+                                <td><p>request url</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$body </td>
+                                <td><p>body for the request</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|null</td>
+                                <td>$extraHeaders </td>
+                                <td><p>Extra headers for request</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    object
+                                            &mdash; <p>$response Response class object with details of status and content.</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method__doMethod" name="method__doMethod" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">_doMethod()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">_doMethod( <span class="argument">$method</span>, string <span class="argument">$relativeUrl</span>, string|null <span class="argument">$body</span>, array|null <span class="argument">$extraHeaders</span>) : object</pre>
+                <p><em>Common Method for all the METHODS like GET, POST, PUT and DELETE</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$method </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$relativeUrl </td>
+                                <td><p>request url</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$body </td>
+                                <td><p>body for the request</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>array|null</td>
+                                <td>$extraHeaders </td>
+                                <td><p>Extra headers for request</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    object
+                                            &mdash; <p>$response Response class object with details of status and content.</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSystemDateTime" name="method_getSystemDateTime" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSystemDateTime()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSystemDateTime() : string</pre>
+                <p><em>Get the System Date time</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                            &mdash; <p>$response return system date and time</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getSystemDateTimeMillis" name="method_getSystemDateTimeMillis" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getSystemDateTimeMillis()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getSystemDateTimeMillis() : string</pre>
+                <p><em>Get the System Date time in milli seconds</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getOAuthHeaders" name="method_getOAuthHeaders" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getOAuthHeaders()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getOAuthHeaders(string <span class="argument">$method</span>, string <span class="argument">$url</span>, string <span class="argument">$body</span>, string <span class="argument">$apiRoute</span>) : object</pre>
+                <p><em>Get the headers</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$method </td>
+                                <td><p>GET/POST/PUT/DELETE method</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$url </td>
+                                <td><p>request url</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$body </td>
+                                <td><p>body for the request</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$apiRoute </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    object
+                                            &mdash; <p>$this->oauthHeaders Authenticated Headers for a user type</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getPreferredFormat" name="method_getPreferredFormat" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getPreferredFormat()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getPreferredFormat() : \Core\DataFormat</pre>
+                <p><em>Get DataFormat preferred by operations</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    \Core\DataFormat
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setPreferredFormat" name="method_setPreferredFormat" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setPreferredFormat()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setPreferredFormat(string <span class="argument">$dataFormat</span>) : null</pre>
+                <p><em>Set DataFormat preferred by operations</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$dataFormat </td>
+                                <td><p>Data Format xml|json to be sent</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    null
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_useOAuth1" name="method_useOAuth1" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">useOAuth1()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">useOAuth1() : null</pre>
+                <p><em>Makes all future request use OAuth1 security</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    null
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_useOAuth2" name="method_useOAuth2" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">useOAuth2()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">useOAuth2( <span class="argument">$userName</span>,  <span class="argument">$password</span>) : null</pre>
+                <p><em>Makes all future request use OAuth2 Assertion security</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$userName </td>
+                                <td></td>
+                            </tr>
+                                                    <tr>
+                                <td></td>
+                                <td>$password </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    null
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_destroy" name="method_destroy" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">destroy()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">destroy() : null</pre>
+                <p><em>unset all the variables</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    null
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                    <dt>Inherited from</dt>
+                    <dd><a href="../classes/Core.AbstractService.html"><div class="path-wrapper">\Core\AbstractService</div></a></dd>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_doMethod" name="method_doMethod" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">doMethod()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">doMethod(string <span class="argument">$method</span>, string <span class="argument">$relativeUrl</span>, string|null <span class="argument">$body</span>, string|null <span class="argument">$extraHeaders</span>) : \Core\Output</pre>
+                <p><em>Performs HTTP operations using the selected authentication method</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$method </td>
+                                <td><p>The HTTP Method to user</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$relativeUrl </td>
+                                <td><p>The URL after .com (/me)</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$body </td>
+                                <td><p>The body of the message</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string|null</td>
+                                <td>$extraHeaders </td>
+                                <td><p>Extra headers to include in the request</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Core\Exception</dt>
+                            <dd><p>if request leads to an error</p></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    \Core\Output
+                                            &mdash; <p>in the preferred data format</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getServiceIdentifier" name="method_getServiceIdentifier" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">getServiceIdentifier()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getServiceIdentifier() : \Core\Unique</pre>
+                <p><em>Provides name of library for identification purposes</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    \Core\Unique
+                                            &mdash; <p>identifier for library</p>
+                                                </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">BasicService.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/Core/BasicService.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/Auth.html">\Auth</a></li>
+                                                                            <li><a href="../namespaces/Content.html">\Content</a></li>
+                                                                            <li><a href="../namespaces/Core.html">\Core</a></li>
+                                                                            <li><a href="../namespaces/Exams.html">\Exams</a></li>
+                                                                            <li><a href="../namespaces/Grade.html">\Grade</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on August 20th, 2014 at 19:36.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>

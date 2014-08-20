@@ -1,0 +1,251 @@
+/*
+ * HTML5 Boilerplate
+ *
+ * What follows is the result of much research on cross-browser styling.
+ * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
+ * Kroc Camen, and the H5BP dev community and team.
+ */
+
+/* ==========================================================================
+   Base styles: opinionated defaults
+   ========================================================================== */
+
+html,
+button,
+input,
+select,
+textarea {
+	font-family: 'Roboto', sans-serif;
+	font-weight:400; 
+    color: #484848;
+	margin:0px; 
+}
+
+body {
+    font-size: 0.9em;
+    line-height: 1.4;
+	margin:0px; 
+}
+
+h1,h2,h3,h4,h5,h6{ 
+	font-family: 'Raleway', sans-serif;
+	font-weight:500; 
+} 
+strong,b{ 
+	font-weight:700;
+}
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+a,a:visited{ 
+	color:blue; 
+} 
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+
+#TopColorbar{ 
+	width:100%; 
+	background: #6c9730; 
+	background: linear-gradient(to right,#D22B47,#d8ad45,#A5C341); 
+	height: 5px;
+} 
+#TitleBar{ 
+	padding-left:0px; padding-right:0px; background-color: #42474D; height: 51px;
+} 
+#TitleBar > div{ 
+	height:56px; position:relative;
+} 
+#TitleBar > div > a:first-child > img{ 
+	width:140px;margin:7px 0px 0px 10px;
+} 
+#TitleBar > div > a:last-child{ 
+	color:#FFFFFF; display:inline-block; float:right; margin:18px 10px 0px 0px;
+} 
+#MastBar{ 
+	display:block; line-height:18px; margin-bottom:0px; color:#FFFFFF; height:56px; width:100%;
+} 
+article{ 
+	padding:10px; 
+	max-width:850px;
+	margin:0 auto;  
+} 
+footer{ 
+	margin:10px auto 20px; 
+	font-size:0.8em; 
+	color:#CCCCCC; 
+	max-width:850px;
+	padding:10px; 
+} 
+footer a{ 
+	color:#999 !important; 
+} 
+h1{ 
+	font-size:1.6em; 
+} 
+h2{ 
+	font-size:1.4em; 
+	margin-top:2em;
+} 
+h4{
+	font-weight:700
+}
+
+table{ 
+	max-width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
+	width: 100%;
+	margin-bottom: 18px;
+	color: #686868;
+	border: 1px solid #cacaca;
+} 
+table th{ 
+	min-height: 25px;
+	line-height: 18px;
+	text-align: left;
+	border-bottom: 1px solid #E8E8E8;
+	font-weight: bold;
+	border-right: 1px dashed #E8E8E8;
+	padding: 8px;
+	background: #8FC688;
+	border: none;
+	color: #FFF;
+	vertical-align: middle;
+	font-size:1.1em; 
+} 
+table th.middle{ 
+	text-align: left;
+	border-bottom: 1px solid #E8E8E8;
+	font-weight: bold;
+	border-right: 1px dashed #E8E8E8;
+	padding: 8px;
+	background: #DEDEDE;
+	border: none;
+	color: #888;
+	vertical-align: middle;
+	font-size:1em; 
+} 
+table td{ 
+	color: #686868;
+	min-height: 25px;
+	line-height: 18px;
+	text-align: left;
+	vertical-align: top;
+	border-top: 1px solid #e8e8e8;
+	border-right: 1px dashed #E8E8E8;
+	padding: 8px;
+	border: 1px solid #cacaca;
+} 
+
+blockquote{ 
+	clear: both;
+	margin: 1em 0;
+	border: 1px solid #ccc;
+	padding: .5em;
+	background-color: #eee;
+	font-size:.9em;
+} 
+
+blockquote h3{ 
+	font-weight:700; 
+	margin:0px; 
+	font-size:1.1em; 
+} 
+
+blockquote p:first-of-type{ 
+	margin-top:0px; 
+} 
+
+blockquote p:last-child{
+	margin-bottom:0px; 
+}  
+
+li > ul{ 
+	margin-top:0px; 
+} 
+div.authmethods{ 
+	
+} 
+div.authmethods span{ 
+	display:inline-block; 
+	margin:2px 0px 2px 5px; 
+	color:#FFFFFF; 
+	padding:2px 4px; 
+	border-radius:3px;
+	font-size:0.8em; 
+} 
+div.authmethods span:first-child{
+	margin-left:0px; 
+} 
+
+div.authmethods span.oauth1{ 
+	background-color:rgb(151,204,103);
+} 
+div.authmethods span.oauth2-teacher{ 
+	background-color:rgb(221,82,92);
+} 
+div.authmethods span.oauth2-ta{ 
+	background-color:rgb(95,190,202);
+} 
+div.authmethods span.oauth2-student{ 
+	background-color:rgb(86,86,86);
+} 
+div.authmethods span.oauth2-admin{ 
+	background-color:#CCC; 
+} 
+div.authmethods span.oauth2-all{ 
+	border:1px solid rgb(86,86,86);
+	color:rgb(86,86,86);
+} 
+
+
+/*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    `contenteditable` attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ */
+
+.clearfix:before,
+.clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+
+.clearfix {
+    *zoom: 1;
+}
+

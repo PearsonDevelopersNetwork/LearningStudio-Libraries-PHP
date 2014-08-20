@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>LearningStudio Exams Library in PHP</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+		<link href='http://fonts.googleapis.com/css?family=Raleway:500,700|Roboto:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="../assets/css/normalize.css">
+        <link rel="stylesheet" href="../assets/css/main.css">
+        <link rel="stylesheet" href="../assets/css/prism.css">
+        <script src="../assets/js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+	<div id="MastBar">
+		<div id="TopColorbar"> </div>
+		<div id="TitleBar">
+			<div>
+				<a href="http://pdn.pearson.com" target="_blank" title="Home"><img src="../assets/pdn-header-sm.PNG" /></a>
+				<a href="http://pdn.pearson.com" target="_blank">pdn.pearson.com</a>
+			</div>
+		</div>
+	</div>
+		
+	<article> 
+		<h1>Exams</h1>
+		<blockquote>
+			<h3>Documentation</h3>
+			<p>The complete documentation for the Exams APIs is <a href="http://pdn.pearson.com/apis/exams">available here</a>.</p>
+		</blockquote>
+		<blockquote>
+			<h3>API Keys</h3>
+			<p>You will need keys to work with the APIs.</p>
+			<ul>
+				<li><b>Application ID</b>: Identifies your Application for analytics and quota limits.</li> 
+				<li><b>Campus Keys</b>: A <i>Token Key Moniker (TKM)</i>, <i>Shared Secret</i>, and <i>Client String</i> identifies the LearningStudio campus where your data comes from.</li>
+			</ul>
+			<p>You can get an Application ID for your app and campus keys for our Sandbox Campus by creating an app on the PDN. <a href="http://pdn.pearson.com/learningstudio/get-a-key">Learn more here</a>.
+		</blockquote>
+		<blockquote>
+			<h3>Supported Formats</h3>
+			<p>This library only supports JSON-formatted requests.</p>
+		</blockquote>		
+		<blockquote>
+			<h3>Identifier Parameter Types</h3>
+			<p>Except where specified, all parameters types are strings including identifiers like Course ID, User ID, etc.</p>
+		</blockquote>
+
+		
+		<h4>Contents</h4>
+		<ul>
+			<li><a href="#Introduction">Introduction</a></li>
+			<li><a href="#Usage">Using Exams</a>
+				<ul>
+					<li><a href="#Start">Get Started - Instantiating the Object</a></li>
+					<li><a href="#Methods">Available Methods</a>	
+						<ul>
+						<li><a href="#ExamDetails">Exam Details</a></li>
+						<li><a href="#Provisioning">Provisioning a User's Exam</a></li>
+						<li><a href="#Attempts">Exam Attempts</a></li>
+						<li><a href="#Questions">Questions and Answers</a></li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		
+		<a name="Introduction"></a>
+		<h2>Introduction</h2>
+		<p>The Exams library facilitates working with our Exams APIs for LearningStudio. This is one of our more complex areas, so the library is intended to streamline a variety of operations.</p>
+		<p>This library provides a PHP-specific method for each of the Exams API endpoints. Note that the library speaks in JSON, so you will provide JSON payloads to POST and PUT requests, and receive responses as JSON-formatted strings. The parameters of the method are the values that would be inserted into the endpoint, for example, <code>/users/<b>{userId}</b>/courses</code>. The complete documentation for each method is linked in the Methods section, below.</p> 
+		 <p>This library also has composite methods that combine multiple API calls into one method, streamlining some otherwise chatty API calls into one method for your code.</p> 
+		<h4>Exams, User Exams, and Attempts</h4>
+		<p>In LearningStudio's Exams system, an Exam is a container made of exam settings (e.g., time limit, password, etc), the exam sections, and the pool of questions. The question pool sometimes has more questions than a user will answer; this allows for a more random exam. Sections may be analogous to "pages," but the display of the exam is your prerogative.</p> 
+		<p>When a user is ready to take an exam, a User Exam must be provisioned. This creates a unique set of questions for that specific user, randomly selecting questions for each section from the question pool.</p>
+		<p>With an exam provisioned for the user, the user can start an attempt. An attempt is where a student's answers are temporarily stored while they take an exam. Then when all the questions have been answered (or skipped), the attempt is submitted back to the Exams system.</p>
+		<p>Attempts may have time limits, and if so, must be submitted before the time expires; attempts are not auto-submitted when the time runs out - you <i>must</i> submit the attempt or it will end up in a limbo state. A student can only have one active attempt at a time, though some exams allow multiple attempts. Only the most recent attempt submitted is saved as the user's completed exam.</p>
+		<p><img src="../assets/ExamsConcept.png"></p>
+		
+		<hr>
+		
+		<a name="Usage"></a>
+		<h2>Using Exams</h2> 
+		
+		
+		<a name="Start"></a>
+		<h3>Instantiating the Library</h3>
+		
+		<h4>Setup</h4>
+		<p>To begin, include the <code>learningstudio-init.php</code> file to your script to handle class autoloading, and use the <code>use</code> operator for the classes you'll be instantiating.</p>
+		<pre><code class="language-php">include('path/to/library/learningstudio-init.php');
+
+use Auth\Config\OAuthConfig;
+use Auth\OAuthServiceFactory;
+use Exams\ExamService;</code></pre>
+
+		<h4>Authentication</h4>
+		<p>You'll need to provide your authentication details (keys, client string, etc) so the Core library can handle authentication. The <code>OAuthConfig</code> class is a generic carrier for the configuration information for all authentication methods. You'll add the information you need using the following methods.</p> 
+		<pre><code class="language-php">$config = new OAuthConfig();
+$config->setApplicationId( $ApplicationID );
+$config->setApplicationName( $ApplicationName );
+$config->setTokenKeyMoniker( $TokenKeyMoniker );
+$config->setSharedSecret( $SharedSecret );
+$config->setClientString( $ClientString );</code></pre>
+		<p>There are differences in what values are needed between the different OAuth methods. Generally, adding all five pieces of information is most flexible, but you can leave out the pieces you don't need. For example, if using OAuth 1 only (System to System calls), you don't need the Application Name or Client String.</p>
+			<p>The <code>OAuthServiceFactory</code> object instantiates the appropriate service for the authentication method you want to use. When using core, you only need to create the Factory and pass it to the Core library.</p> 
+		<pre><code class="language-php">$oauthFactory = new OAuthServiceFactory( $config );</code></pre>
+		
+		<h4>Requests</h4>
+		
+		<p>Next, you'll instantiate the <code>ExamService</code> class, which handles all the work of making an API call and provides PHP-specific methods for the Exams API. When creating the object, pass the OAuth Factory as the only parameter:</p>
+
+		<pre><code class="language-php">$ExamService = new ExamService( $oauthFactory );</code></pre>
+		
+		<p>Before making an API call, set the service to the OAuth method you'll use. If using OAuth 2 for a user token, pass the user's username, and if using Password grant type, also send the password. </p> 
+		
+		<pre><code class="language-php">// OAuth 1
+$ExamService->useOAuth1();
+
+//OAuth 2 Assertion Grant Type
+$ExamService->useOAuth2( $UserName );
+
+//OAuth 2 Assertion Grant Type
+$ExamService->useOAuth2( $UserName, $Password );</code></pre>
+
+		<p>Finally, use the methods detailed below to make requests.</p>
+		
+		<h4>Results</h4>
+		<p>All of the Exams methods will return a <code>Response</code> object. This object has these methods:</p>
+		<table> 
+			<tr>
+				<th>Method</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code>getContentType()</code></td>
+				<td>Returns the type of response, either <code>json</code> or <code>xml</code> if it's text-based, or the MIME type of the content if binary content.</td>
+			</tr>
+			<tr>
+				<td><code>getContent()</code></td>
+				<td>Returns the text-based body of the response from the API. It is returned as a string of either JSON or XML, and is not parsed into a native object.</td>
+			</tr>
+			<!-- <tr>
+				<td><code>getBinaryContent()</code></td>
+				<td>Returns the binary-based body of the response from the API, if <code>isBinaryContent()</code> returns <code>true</code>.</td>
+			</tr>
+			<tr>
+				<td><code>isBinaryContent()</code></td>
+				<td>Returns either <code>true</code> or <code>false</code> as to whether the body of the API response is binary data (for example, if downloading a document or threaded discussion attachment).</td>
+			</tr> -->
+			<tr>
+				<th class="middle" colspan="2">About the API Request</th>
+			</tr>
+			
+			<tr>
+				<td><code>getHeaders()</code></td>
+				<td>Returns the headers used in the request.</td>
+			</tr>
+			<tr>
+				<td><code>getMethod()</code></td>
+				<td>Returns the HTTP method that was used.</td>
+			</tr>
+			<tr>
+				<td><code>getStatusCode()</code></td>
+				<td>Returns the HTTP Status Code from the API request. Example:<code>200</code>, <code>201</code>, <code>400</code>, etc. </td>
+			</tr>
+			<tr>
+				<td><code>getStatusMessage()</code></td>
+				<td>Returns the HTTP Status message from the API request. Example:<code>Created</code> or <code>Not Found</code>. </td>
+			</tr>
+			<tr>
+				<td><code>getUrl()</code></td>
+				<td>Returns the URL that was called to make the request.</td>
+			</tr>
+			<tr>
+				<td><code>isError()</code></td>
+				<td>Returns either <code>true</code> or <code>false</code> as to whether there was a problem with the API request.</td>
+			</tr>
+		</table>
+		
+		<h4>Example</h4>
+		<pre class="line-numbers"><code class="language-php">include('path/to/library/learningstudio-init.php');
+
+use Auth\Config\OAuthConfig;
+use Auth\OAuthServiceFactory; 
+use Exams\ExamService; 
+
+$ApplicationID   = "";   // Identifies your Application
+$ApplicationName = "";   // No spaces for best results (e.g., MyAppName)
+$TokenKeyMoniker = "";   
+$SharedSecret    = "";   
+$ClientString    = "";   
+
+$UserName        = ""; 
+
+
+$config = new OAuthConfig();
+$config->setApplicationId( $ApplicationID );
+$config->setApplicationName( $ApplicationName );  // Needed only for OAuth 2 Assertion 
+$config->setTokenKeyMoniker( $TokenKeyMoniker );
+$config->setSharedSecret( $SharedSecret );        // Needed only for OAuth 1 &amp; OAuth 2 Assertion 
+$config->setClientString( $ClientString );	      // Needed only for OAuth 2
+
+$oauthFactory = new OAuthServiceFactory( $config );
+
+$ExamService = new ExamService( $oauthFactory );
+
+$ExamService->useOAuth2( $UserName ); 
+
+try{ 
+	
+	$LSResponse = $ExamService->getAllExamItems ($userId, $courseId ); 
+	
+} catch(Exception $e){ 
+	// process exception
+	exit; 
+} 
+
+if( !$LSResponse->isError() ){ 
+			
+	$StringBody = $LSResponse->getContent(); 
+	
+	if($LSResponse->getContentType() == 'json'){ 
+		
+		$Body = json_decode( $StringBody ); 
+		
+	} 
+}</code></pre>
+
+	<hr>
+	
+	<a name="Methods"></a>
+	<h3>Available Methods</h3>
+	
+		<blockquote>
+			<h3>Identifier Overloads</h3>
+			<p>Wherever you need to pass a user ID or a course ID, you can also use username and call number overloads. For example, either of these requests would work:</p>
+			<p><code>getAllExamItems ( '12345678', '987654321' );</code></p>
+			<p><code>getAllExamItems ( 'loginid={CLIENT_STRING}|{USERNAME}', 'ccn={CALL_NUMBER}' );</code></p>
+		</blockquote>
+		
+		
+	<br>	
+	<a name="ExamDetails"></a>
+	<h4>Exam Details</h4>
+	
+	<pre><code class="language-php">getAllExamItems ($userId, $courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	
+	<ul>
+		<li>This is a composite method that scans the course's content structure for any exams. The result will be the same as the <code>/courses/{courseId}/items</code> API, but limited to Exams.</li>
+		<li>In each content item, the Exam itself, including the ID, will be linked in the <code>links</code> portion of each item.</li>
+		<li>While this method retrieves exams from the content structure and has links that denote the parent Unit and Content Item ID, it has a very similar result as the <code>getExamDetails()</code> method, which retrieves all the exams in a course and provides the Exam ID as a readily available property.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/courses/courses-resources/uri-items-for-course_x">Course Items API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getExamDetails ($userId, $courseId [, $examId ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Returns the details for an exam such as its title, description, allowed number of attempts, allowed duration, and when it will be graded in the grade book.</li>
+		<li><code>$examId</code> is optional. If left out, this API returns all Exams in the course. Provide an Exam ID here to limit it to a specific one.</li>
+		<li>The Exam Title stored here is distinct from the Content Item title retrieved from the <code>getAllExamItems()</code> method. In the previous method, you will get the title that appears in the left-side content menu of LearningStudio. In this method, you'll get the title and description attached to the Exam itself, which could be different (or blank).</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-details-user_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getExamSchedules ($courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-admin">OAuth 2 As Administrator</span>
+	</div> -->
+
+	<ul>
+		<li>Returns the gradebook review dates for the exams in the course. This is the date when the exams' grades are made available to students.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/schedules/schedules-resources/uri-exam-schedules-for-course_x">API Documentation</a></li>
+	</ul>
+
+	
+	<br>	
+	<a name="Provisioning"></a>
+	<h4>Provisioning a User's Exam</h4>
+	<pre><code class="language-php">getExistingExams ($userId, $courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Returns the provisioned User Exams that have been created for this user. A provisioned User Exam is the user-specific set of questions (which can be different between users).</li>
+		<li>This API call returns the <code>ID</code>, <code>title</code>, and <code>description</code> like the <code>getExamDetails()</code> method. It also includes a <code>duration</code> value which is specific to the user; some users are allowed additional time, so this property reflects the time this user is allowed. Likewise, the <code>isRetakable</code> property flags whether the student can try multiple attempts.</li>
+		<li>Once an exam is provisioned, it can only be deleted by an Administrator user (i.e., the OAuth 2 token provided must be for an Admin user). This is a "reset" workflow, and is intended to be used only when the exam is in a limbo or error state. For example, this occurs when a timed exam expires before being submitted. Teachers can also reset the exam using the LearningStudio user interface.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-course-exams-user_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getExistingExam ($userId, $courseId, $examId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Returns a specific provisioned User Exam.</li>
+		<li><code>$examId</code> is the Exam ID retrieved from <code>getExamDetails()</code> method, above. </li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-course-exams-user_x">API Documentation</a></li>
+	</ul>
+
+	<br><pre><code class="language-php">createUserExam ($userId, $courseId, $examId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+
+	<ul>
+		<li>Provisions a User Exam.</li>
+		<li><code>$examId</code> is the Exam ID retrieved from <code>getExamDetails()</code> method, above.</li>
+		<li>User Exams must be provisioned before the question detail can be retrieved and an attempt can be started.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-course-exams-user_x">API Documentation</a></li>
+	</ul>
+
+	<br><pre><code class="language-php">deleteUserExam ($userId, $courseId, $examId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-admin">OAuth 2 As Administrator</span>
+	</div> -->
+
+	<ul>
+		<li>Deletes a provisionied User Exam (allows for a "reset" of the exam).</li>
+		<li><code>$examId</code> is the Exam ID retrieved from <code>getExamDetails()</code> method, above.</li>
+		<li>Once an exam is provisioned, it can only be deleted by an Administrator user (i.e., the OAuth 2 token provided must be for an Admin user). This is intended to be used only when the exam is in a limbo or error state. For example, this occurs when a timed exam expires before being submitted. Teachers can also reset the exam using the LearningStudio user interface.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-course-exams-user_x">API Documentation</a></li>
+	</ul>
+	
+		<br>	
+	<a name="Attempts"></a>
+	<h4>Exam Attempts</h4>
+	<blockquote>
+		<h3>Exam Tokens</h3>
+		<p>The API documentation describes a "Pearson Exam Token" that is an additional required HTTP header for some operations once an attempt is started. This library will handle adding the Token where required.</p> 
+	</blockquote>
+
+	<pre><code class="language-php">createExamAttempt ($userId, $courseId, $examId [, $examPassword ])</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>This method starts an attempt - which is where answers are temporarily stored while the user is taking the exam.</li>
+		<li>This operation starts the clock on timed exams. The response will include a <code>startUtc</code> property that notes the exam time it started. Be sure to calculate the duration of the exam using the detail from <code>getExistingExam()</code>. If the exam is timed, you must invoke <code>completeExamAttempt</code> before the time runs out.</li> 
+		<li>Some teachers set a password on exams to control access. If so, pass the password entered by the user in the fourth parameter. Note, unfortunately the APIs do not currently notify you whether an exam requires a password or not. If a password is required and not provided, the API returns an error object. You should consult the business rules for your organization as to whether your teachers may use passwords.</li>
+		<li>If an exam is retakable, you must first close an attempt and then create a new one using this same method.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempts-user_x">API Documentation</a></li>
+	</ul>
+	<br><pre><code class="language-php">startExamAttempt ($userId, $courseId, $examId, $examPassword = NULL)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+
+	<ul>
+		<li>This is essentially an alias of <code>createExamAttempt</code>, but it first checks for an existing attempt. If there is no existing attempt, it creates one. This prevents an error if you accidentally try to create an attempt where one already exists.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempts-user_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getExamAttempts ($userId, $courseId, $examId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+
+	<ul>
+		<li>Returns all the currently open attempts for a user.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempts-user_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getExamAttempt ($userId, $courseId, $examId, $attemptId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Returns a specific open attempts for a user, specified by its ID in <code>$attemptId</code>.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempts-user_x">API Documentation</a></li>
+	</ul>
+
+	<br><pre><code class="language-php">getCurrentExamAttempt ($userId, $courseId, $examId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Returns all the currently open attempts for a user for an exam, excludes attempts marked "completed."</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempts-user_x">API Documentation</a></li>
+	</ul>
+
+	<br><pre><code class="language-php">completeExamAttempt ($userId, $courseId, $examId, $attemptId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Marks an attempt as complete, which transfers the answers back to the main Exams system for grading.</li>
+		<li>If the exam is timed, you must mark it as complete before the expiration, or the attempt ends up in limbo and the exam must be deleted and reset using <code>deleteUserExam</code>.</li>
+		<li>This method executes a <code>PUT</code> request for the attempt. Technically this API requires a body, but because there is only one option (to mark it as completed), the method handles that for you; no additional payload is needed for this method.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempts-user_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getExamAttemptSummary ($userId, $courseId, $examId, $attemptId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Returns a summary of the user's exam results, including the total points possible and earned, as well as breaking that data out by question type.</li>
+		<li>The exam attempt <i>must</i> be marked as completed or this API returns <code>403-Forbidden</code>.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempts-summary-user_x">API Documentation</a></li>
+	</ul>
+	
+		<br>	
+	<a name="Questions"></a>
+	<h4>Questions and Answers</h4>
+
+	<pre><code class="language-php">getExamSections ($userId, $courseId, $examId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Returns the sections (with IDs needed in the next method) for an exam.</li>
+		<li>All exams have at least one section. A section may be analagous to a "page" of a test booklet, but you can opt to display sections in any way in your UI.</li>
+		<li>You must first provision a User Exam, but an active attempt is not required to get the sections.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-sections-user_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getExamSectionQuestions ($userId, $courseId, $examId, $sectionId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+
+	<ul>
+		<li>This is a composite function that greatly simplifies the work of retrieving all the questions in a section as well as the answer choices for true/false or multiple-choice questions. Because it's making many different API calls, it can be a little slower than the average method here, but using this one will make your programming effort much simpler.</li> 
+		<li>This method returns an array where every member of the array is an object with three properties: <ul>
+			<li><code>question</code> is an object with the ID and text of the question.</li>  
+			<li><code>choices</code> is an array where every item is an object with the ID of the answer and the text of the answer option (for true-false, multiple-choice, many-multiple-choice, and matching questions only). You will use this ID when submitting the user's answer.</li>
+			<li><code>premise</code> is is an array where every item is an object with the ID of the premise and the text of the premise. A premise is the thing to which a choice is matched in a matching questions.</li>
+			<li><code>type</code> is the type of question.</li>
+			<li><code>id</code> is the question ID (repeated).</li>
+			<li><code>pointsPossible</code> is how many points the question is worth.</li>
+			</ul>
+		</li>
+		<li>This method combines up to 12 different API endpoints, so the documentation is spread out over many pages. The <a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-section-questions-user_x">API Documentation for Questions is here</a>, and the documentation for each question type can be <a href="http://pdn.pearson.com/apis/exams/api-resources">found from this list</a>.
+	</ul>
+		  
+	<br><pre><code class="language-php">answerQuestion ($userId, $courseId, $examId, $attemptId, $questionId, $answer)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Use this method to record the user's answer to an exam question. This method will update the answer if it already exists, or create a new answer if it doesn't.</li>
+		<li><code>$answer</code> is the JSON-formatted payload that will be sent to the API. The format for the payload is different for each type of question. In true-false, multiple-choice, many-multiple-choice, and matching questions, you will need the IDs of the choices (and premises for matching), returned in the composite method <code>getExamSectionquestions</code>, above. </li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempt-answers-user_x#requestbody">Sample payloads for Each Question Type in the API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getQuestionAnswer ($userId, $courseId, $examId, $attemptId, $questionId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Returns the user's answer for the given question.</li>
+		<li>If no answer exists the API returns a 404 status code.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempt-answers-user_x">API Documentation</a></li>
+	</ul>
+
+	<!-- 
+	<br><pre><code class="language-php">getExamSectionQuestion ($userId, $courseId, $examId, $sectionId, $questionType, $questionId)</code></pre> 
+	There's no method for getting just a list of question IDs, so this method wouldn't be useful.
+	-->
+	
+	<br><pre><code class="language-php">deleteQuestionAnswer ($userId, $courseId, $examId, $attemptId, $questionId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Deletes the user's answer for the given question.</li>
+		<li>If no answer exists the API returns a 404 status code.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/exam/exam-resources/uri-exam-attempt-answers-user_x">API Documentation</a></li>
+	</ul>
+		
+		
+		
+		
+		
+		
+	</article> 	
+	<footer>
+		&copy;2014 Pearson Education Inc. Libraries released under the <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache 2.0 License</a>. For help with these libraries or the APIs, please use the <a href="https://community.pdn.pearson.com" target="_blank">PDN Developer Community</a>.
+	</footer>
+        <script src="../assets/js/prism.js"></script>
+
+    </body>
+</html>

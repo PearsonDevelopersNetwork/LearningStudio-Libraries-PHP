@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>LearningStudio Libraries in PHP</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+		<link href='http://fonts.googleapis.com/css?family=Raleway:500,700|Roboto:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="assets/css/normalize.css">
+        <link rel="stylesheet" href="assets/css/main.css">
+        <script src="assets/js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+	<div id="MastBar">
+		<div id="TopColorbar"> </div>
+		<div id="TitleBar">
+			<div>
+				<a href="http://pdn.pearson.com" target="_blank" title="Home"><img src="assets/pdn-header-sm.PNG" /></a>
+				<a href="http://pdn.pearson.com" target="_blank">pdn.pearson.com</a>
+			</div>
+		</div>
+	</div>
+		
+	<article> 
+		<h1>The LearningStudio PHP Libraries</h1>
+		<p>The LearningStudio Libraries make working with the RESTful Course APIs easier. There are five libraries in all - two for basic functionality and three that streamline our more complex and common domains. This user guide describes the various functionality and use cases, but you can also skip straight to the <a href="AutoDocs/index.html">auto-generated documentation</a> if you prefer.</p> 
+		<h2>Pre-Requisites</h2>
+		<h3>API Documentation</h3>
+		<p>These libraries are designed only as wrappers for the RESTful APIs. They make using the APIs easier, but will simply return the response from the API (i.e., a JSON payload). You should be sure to read the API documentation and background information for LearningStudio while using these libraries. Here are some key places to start: 
+			<ul>
+				<li><a href="http://pdn.pearson.com/learningstudio/learningstudio-introduction">LearningStudio Introduction</a></li>
+				<li><a href="http://pdn.pearson.com/learningstudio/general-api-information">LearningStudio Data Structure and API Information</a></li>
+				<li><a href="http://pdn.pearson.com/api_resources/778">API Reference</a></li>
+			</ul>
+		<h3>Keys</h3>
+		<p>For all API requests, you'll need a set of API keys. The <b>Application ID</b> identifies your application, and you should have a different one for every application you develop. The <b>Token Key Moniker</b>, <b>Shared Secret</b>, and <b>Client String</b> control access to the LearningStudio campus you're integrating with. Every new campus you integrate with will require a new TKM, Secret and Client String, but you'll use the same Application ID.  </p>
+		<p>You can get keys for the Sandbox Campus through the PDN portal. Here's more information:</p>
+			<ul>
+				<li><a href="http://pdn.pearson.com/learningstudio/get-a-key">How to Get Keys</a></li>
+				<li><a href="http://pdn.pearson.com/learningstudio/multitenancy">Introduction to Multitenancy (Software-as-a-Service)</a></li>
+				<li><a href="http://pdn.pearson.com/learningstudio/sandbox-campus">About the Sandbox Campus</a></li>
+			</ul>
+			
+		<h2>The Libraries</h2> 
+		<table> 
+			<tr>
+				<th width="20%">Library</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><a href="detail/library-authentication.html">Authentication</a></td>
+				<td>LearningStudio uses OAuth 1.0a and OAuth 2 schemes for securing access to the APIs; both schemes can feel difficult at first, so this library streamlines the work of creating a signature for a request (OAuth 1) or generating a token for a user (OAuth 2). The Core library uses this library to generate the necessary authentication for the request.</td>
+			</tr>
+			<tr>
+				<td><a href="detail/library-core.html">Core</a></td>
+				<td>A generic all-purpose library that allows you to call any RESTful endpoint for LearningStudio. Core works natively with Authentication, so in using this library you simply provide your API keys, specify an OAuth type, and if necessary a username or password. Core takes care of generating the appropriate authentication for the request. The Exams, Grades, and Content libraries use Core.</td>
+			</tr>
+			<tr>
+				<td><a href="detail/library-exams.html">Exams</a></td>
+				<td>The exams system is one of our more complex set of APIs, so this library provides a variety of functions mapped to the APIs, plus helper functions for streamlining some operations. If you are building an application that provides an alternative way for students to take exams (i.e. a mobile application), this is the library you'll want to use.</td>
+			</tr>
+			<tr>
+				<td><a href="detail/library-grades.html">Grades</a></td>
+				<td>Interacting with the LearningStudio Gradebook is the most common reason people use LearningStudio APIs. This library makes working with the gradebook APIs a little bit easier.</td>
+			</tr>
+			<tr>
+				<td><a href="detail/library-content.html">Content & Threads</a></td>
+				<td>LearningStudio content is split between several different domains and API paths, depending on the type of content. This library brings all those different types together into a single interface.</td>
+			</tr>
+		</table>
+		
+	</article> 	
+	<footer>
+		&copy;2014 Pearson Education Inc. Libraries released under the <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache 2.0 License</a>. For help with these libraries or the APIs, please use the <a href="https://community.pdn.pearson.com" target="_blank">PDN Developer Community</a>.
+	</footer>
+
+    </body>
+</html>

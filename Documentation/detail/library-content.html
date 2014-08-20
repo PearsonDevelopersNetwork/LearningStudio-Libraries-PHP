@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>LearningStudio Content Library in PHP</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+		<link href='http://fonts.googleapis.com/css?family=Raleway:500,700|Roboto:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="../assets/css/normalize.css">
+        <link rel="stylesheet" href="../assets/css/main.css">
+        <link rel="stylesheet" href="../assets/css/prism.css">
+        <script src="../assets/js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+	<div id="MastBar">
+		<div id="TopColorbar"> </div>
+		<div id="TitleBar">
+			<div>
+				<a href="http://pdn.pearson.com" target="_blank" title="Home"><img src="../assets/pdn-header-sm.PNG" /></a>
+				<a href="http://pdn.pearson.com" target="_blank">pdn.pearson.com</a>
+			</div>
+		</div>
+	</div>
+		
+	<article> 
+		<h1>Content &amp; Threads</h1>
+		<blockquote>
+			<h3>Documentation</h3>
+			<p>The documentation for the Content Items APIs is <a href="http://pdn.pearson.com/apis/content-items">available here</a>.</p>
+			<p>The documentation for threaded discussions is <a href="http://pdn.pearson.com/apis/threads">available here.</a></p>
+		</blockquote>
+		<blockquote>
+			<h3>API Keys</h3>
+			<p>You will need keys to work with the APIs.</p>
+			<ul>
+				<li><b>Application ID</b>: Identifies your Application for analytics and quota limits.</li> 
+				<li><b>Campus Keys</b>: A <i>Token Key Moniker (TKM)</i>, <i>Shared Secret</i>, and <i>Client String</i> identifies the LearningStudio campus where your data comes from.</li>
+			</ul>
+			<p>You can get an Application ID for your app and campus keys for our Sandbox Campus by creating an app on the PDN. <a href="http://pdn.pearson.com/learningstudio/get-a-key">Learn more here</a>.
+		</blockquote>
+		<blockquote>
+			<h3>Supported Formats</h3>
+			<p>This library only supports JSON-formatted requests.</p>
+		</blockquote>		
+		<blockquote>
+			<h3>Identifier Parameter Types</h3>
+			<p>Except where specified, all parameters types are strings including identifiers like Course ID, User ID, etc.</p>
+		</blockquote>
+
+		
+		<h4>Contents</h4>
+		<ul>
+			<li><a href="#Introduction">Introduction</a></li>
+			<li><a href="#Usage">Using the Content & Threads Library</a>
+				<ul>
+					<li><a href="#Start">Get Started - Instantiating the Object</a></li>
+					<li><a href="#Methods">Available Methods</a>
+						<ul>
+							<li><a href="#Content">Content Items</a></li>
+							<li><a href="#Threads">Threads</a></li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		
+		<a name="Introduction"></a>
+		<h2>Introduction</h2>
+		<p>A course's content is the primary way students learn through an online course. LearningStudio supports several different types of content. Each content type is a different API set, and this library exposes a method for each type of content.</p>
+		<p><strong>Text/Multimedia</strong> content is created using the rich text editor built into LearningStudio, and is simply HTML. This HTML can contain images, videos, iframes, and JavaScript.</p>
+		<p><strong>MS Office Documents</strong> content is derived from an Office document (like Word or Powerpoint) that is uploaded to LearningStudio. LearningStudio offers both a converted HTML version of this content via the APIs, and the option to download the original file.</p>
+		<p><strong>Web Content Upload</strong> content is an uploaded zip file of HTML, along with all assets such as images, stylesheets, or scripts. LearningStudio shows this content as the provided HTML via the APIs, and also offers the option to download the original zip file.</p>
+		
+		<h4>Content Item Organization and IDs</h4>
+		<p>Content in LearningStudio is organized into a two-level hierarchy. The first level is the units, and the second level (nested under each unit), is the actual course content. Unit-level content items can also have content, and are always Text/Multimedia.</p>
+		<p>Each content item has an ID that you will need to retrieve the actual content. If you ever need to know whether a content item is a unit or a standard item, Unit IDs always start with 200, and standard Content Items start with 100.</p> 
+		
+		<h4>Threaded Discussions</h4> 
+		
+		<p>Threaded Discussions are not strictly considered content but are one of the most highly used tools in LearningStudio. The Threads system here works like most other standard threads, with the added ability to track when students read the threads (for reporting against learning outcomes and goals).</p> 
+		<p>A Threaded Discussion is housed in a content item, and the ID of the threaded discussion will be the content item ID. Inside a Threaded Discussion content item, there can be several topics. All activity in Threads is in response to a topic (or are responses to responses to a topic).</p> 
+
+		<h4>User Authentication and Access</h4> 
+		
+		<p>Some of these methods work with OAuth 1, but the best practice is to always use OAuth 2. Content is controlled in a way that prevents students from seeing some items before a certain date or at all, and the Threads system depends on having a user context for posting responses.</p> 
+
+		<hr>
+		
+		<a name="Usage"></a>
+		<h2>Using the Content & Threads Library</h2> 
+		
+		
+		<a name="Start"></a>
+		<h3>Instantiating the Library</h3>
+		
+		<h4>Setup</h4>
+		<p>To begin, include the <code>learningstudio-init.php</code> file to your script to handle class autoloading, and use the <code>use</code> operator for the classes you'll be instantiating.</p>
+		<pre><code class="language-php">include('path/to/library/learningstudio-init.php');
+
+use Auth\Config\OAuthConfig;
+use Auth\OAuthServiceFactory;
+use Content\ContentService;</code></pre>
+
+		<h4>Authentication</h4>
+		<p>You'll need to provide your authentication details (keys, client string, etc) so the Core library can handle authentication. The <code>OAuthConfig</code> class is a generic carrier for the configuration information for all authentication methods. You'll add the information you need using the following methods.</p> 
+		<pre><code class="language-php">$config = new OAuthConfig();
+$config->setApplicationId( $ApplicationID );
+$config->setApplicationName( $ApplicationName );
+$config->setTokenKeyMoniker( $TokenKeyMoniker );
+$config->setSharedSecret( $SharedSecret );
+$config->setClientString( $ClientString );</code></pre>
+		<p>There are differences in what values are needed between the different OAuth methods. Generally, adding all five pieces of information is most flexible, but you can leave out the pieces you don't need. For example, if using OAuth 1 only (System to System calls), you don't need the Application Name or Client String.</p>
+			<p>The <code>OAuthServiceFactory</code> object instantiates the appropriate service for the authentication method you want to use. When using core, you only need to create the Factory and pass it to the Core library.</p> 
+		<pre><code class="language-php">$oauthFactory = new OAuthServiceFactory( $config );</code></pre>
+		
+		<h4>Requests</h4>
+		
+		<p>Next, you'll instantiate the <code>ContentService</code> class, which handles all the work of making an API call and provides PHP-specific methods for the Content Items and Threads APIs. When creating the object, pass the OAuth Factory as the only parameter:</p>
+
+		<pre><code class="language-php">$ContentService = new ContentService( $oauthFactory );</code></pre>
+		
+		<p>Before making an API call, set the service to the OAuth method you'll use. If using OAuth 2 for a user token, pass the user's username, and if using Password grant type, also send the password. </p> 
+		
+		<pre><code class="language-php">// OAuth 1
+$ContentService->useOAuth1();
+
+//OAuth 2 Assertion Grant Type
+$ContentService->useOAuth2( $UserName );
+
+//OAuth 2 Assertion Grant Type
+$ContentService->useOAuth2( $UserName, $Password );</code></pre>
+
+		<p>Finally, use the methods detailed below to make requests.</p>
+		
+		<h4>Results</h4>
+		<p>All of the Content methods will return a <code>Response</code> object. This object has these methods:</p>
+		<table> 
+			<tr>
+				<th>Method</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td><code>getContentType()</code></td>
+				<td>Returns the type of response, either <code>json</code> or <code>xml</code> if it's text-based, or the MIME type of the content if binary content.</td>
+			</tr>
+			<tr>
+				<td><code>getContent()</code></td>
+				<td>Returns the text-based body of the response from the API. It is returned as a string of either JSON or XML, and is not parsed into a native object.</td>
+			</tr>
+			<tr>
+				<td><code>getBinaryContent()</code></td>
+				<td>Returns the binary-based body of the response from the API, if <code>isBinaryContent()</code> returns <code>true</code>.</td>
+			</tr>
+			<tr>
+				<td><code>isBinaryContent()</code></td>
+				<td>Returns either <code>true</code> or <code>false</code> as to whether the body of the API response is binary data (for example, if downloading a document or threaded discussion attachment).</td>
+			</tr>
+			<tr>
+				<th class="middle" colspan="2">About the API Request</th>
+			</tr>
+			
+			<tr>
+				<td><code>getHeaders()</code></td>
+				<td>Returns the headers used in the request.</td>
+			</tr>
+			<tr>
+				<td><code>getMethod()</code></td>
+				<td>Returns the HTTP method that was used.</td>
+			</tr>
+			<tr>
+				<td><code>getStatusCode()</code></td>
+				<td>Returns the HTTP Status Code from the API request. Example:<code>200</code>, <code>201</code>, <code>400</code>, etc. </td>
+			</tr>
+			<tr>
+				<td><code>getStatusMessage()</code></td>
+				<td>Returns the HTTP Status message from the API request. Example:<code>Created</code> or <code>Not Found</code>. </td>
+			</tr>
+			<tr>
+				<td><code>getUrl()</code></td>
+				<td>Returns the URL that was called to make the request.</td>
+			</tr>
+			<tr>
+				<td><code>isError()</code></td>
+				<td>Returns either <code>true</code> or <code>false</code> as to whether there was a problem with the API request.</td>
+			</tr>
+		</table>
+		
+		<h4>Example</h4>
+		<pre class="line-numbers"><code class="language-php">include('path/to/library/learningstudio-init.php');
+
+use Auth\Config\OAuthConfig;
+use Auth\OAuthServiceFactory; 
+use Content\ContentService; 
+
+$ApplicationID   = "";   // Identifies your Application
+$ApplicationName = "";   // No spaces for best results (e.g., MyAppName)
+$TokenKeyMoniker = "";   
+$SharedSecret    = "";   
+$ClientString    = "";   
+
+$UserName        = ""; 
+
+
+$config = new OAuthConfig();
+$config->setApplicationId( $ApplicationID );
+$config->setApplicationName( $ApplicationName );  // Needed only for OAuth 2 Assertion 
+$config->setTokenKeyMoniker( $TokenKeyMoniker );
+$config->setSharedSecret( $SharedSecret );        // Needed only for OAuth 1 &amp; OAuth 2 Assertion 
+$config->setClientString( $ClientString );	      // Needed only for OAuth 2
+
+$oauthFactory = new OAuthServiceFactory( $config );
+
+$ContentService = new ContentService( $oauthFactory );
+
+$ContentService->useOAuth2( $UserName ); 
+
+try{ 
+	
+	$LSResponse = $ContentService->getItems( $courseId ); 
+	
+} catch(Exception $e){ 
+	// process exception
+	exit; 
+} 
+
+if( !$LSResponse->isError() ){ 
+			
+	$StringBody = $LSResponse->getContent(); 
+	
+	if($LSResponse->getContentType() == 'json'){ 
+		
+		$Body = json_decode( $StringBody ); 
+		
+	} 
+}</code></pre>
+
+	<hr>
+	
+	<a name="Methods"></a>
+	<h3>Available Methods</h3>
+	
+		<blockquote>
+			<h3>Identifier Overloads</h3>
+			<p>Wherever you need to pass a user ID or a course ID, you can also use username and call number overloads. For example, either of these requests would work:</p>
+			<p><code>getLastThreadedDiscussionResponse ( '12345678', '987654321' );</code></p>
+			<p><code>getLastThreadedDiscussionResponse ( 'loginid={CLIENT_STRING}|{USERNAME}', 'ccn={CALL_NUMBER}' );</code></p>
+		</blockquote>
+		
+		<br>
+	<a name="Content"></a>
+	<h4>Content Items</h4>
+	<blockquote>
+		<h3>Creating Content Not Supported</h3>
+		<p>Note that the APIs do not presently support creating content items. Content can only be created in the LearningStudio user interface.</p>
+	</blockquote> 
+
+	<br><pre><code class="language-php">getItems ($courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-admin">OAuth 2 As Administrator</span>
+	</div> -->
+
+	<ul>
+		<li>Retrieves the list of content items in the course.</li>
+		<li>This method is best used with OAuth 1 or with OAuth 2 using a Teacher's account. If a content item is not visible to a student, this method fails. Use <code>getUserItems</code> for the safest results (particularly with students)</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/courses/courses-resources/uri-items-for-course_x">API Documentation</a></li> 
+	</ul>
+	<br><pre><code class="language-php">getUserItems ($userId, $courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Retrieves the list of content items in the course.</li>
+		<li>This only returns the content items that user is able to see in LearningStudio.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/courses/courses-resources/uri-items-for-course_x">API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getItemHierarchy ($courseId [, $expandItems ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-admin">OAuth 2 As Administrator</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the list of content items in the course in a hierarchical format, with content items nested as children of units.</li>
+		<li>This will return all content items for the course. If using OAuth 2 and the user is not allowed to see a content item in the results, the API will fail. Use <code>getUserItemHierarchy</code> for the safest results (particularly with students)</li>
+		<li><code>$expandItems</code> is a comma-separated list of the following, if any of these are included in that list, the API will return those nodes' data as well:<ul>
+			<li><code>item</code> - return the detail of the content item</li> 
+			<li><code>item.access</code> - return the detail of the content item's access rules</li> 
+			<li><code>item.schedule</code> - return the detail of the content item's scheduling</li> 
+			<li><code>item.group</code> - return the detail of the group that is allowed to see this content item (if the course uses groups)</li></ul></li>
+		<li>This method is best used with OAuth 1 or with OAuth 2 using a Teacher's account. If a content item is not visible to a student, this method fails.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/courses/courses-resources/uri-items-for-course_x">API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getUserItemHierarchy ($userId, $courseId [, $expandItems ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the list of content items in the course in a hierarchical format, with content items nested as children of units.</li>
+		<li>This only returns the content items that user is able to see in LearningStudio.</li>
+		<li><code>$expandItems</code> is a comma-separated list of the following, if any of these are included in that list, the API will return those nodes' data as well:<ul>
+			<li><code>item</code> - return the detail of the content item</li> 
+			<li><code>item.access</code> - return the detail of the content item's access rules</li> 
+			<li><code>item.schedule</code> - return the detail of the content item's scheduling</li> 
+			<li><code>item.group</code> - return the detail of the group that is allowed to see this content item (if the course uses groups)</li></ul></li>
+		<li>This method is best used with OAuth 1 or with OAuth 2 using a Teacher's account. If a content item is not visible to a student, this method fails.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/courses/courses-resources/uri-items-for-course_x">API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getItem ($courseId, $itemId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+	
+	<ul>
+		<li>Retrieves a specific content item in the course.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/courses/courses-resources/uri-items-for-course_x">API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getItemLinkDetails ($courseId, $itemId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+
+	
+	<ul>
+		<li>Retrieves the values from the "links" found in a content item payload; This includes information for the Access rules, Scheduling and a link to the Parent content item (e.g., a Unit). </li>
+		<li>The payload returned by the <code>getItems()</code> or <code>getItem()</code> methods would only return URLs to get the information; this method executes those URLs to give you the information contained there.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/courses/courses-resources/uri-items-for-course_x">API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getItemContent ($courseId, $itemId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	
+	<ul>
+		<li>This is a composite method that retrieves the web-ready content for a content item regardless of type (Text/Multimedia, MSOfficeDocument, or WebContentUpload).</li>
+		<li>If you want the original, unconverted document for an MSOfficeDocument or WebContentUpload content item, use <code>getMsOfficeDocumentOriginal</code> or <code>getWebContentUploadOriginal</code></li>
+		<li>API Documentation for <a href="http://pdn.pearson.com/pearson-learningstudio/apis/textmultimedia/textmultimedia-resources/uri-text-multimedia-items-for-course_x">Text/Multimedia</a>, <a href="http://pdn.pearson.com/pearson-learningstudio/apis/ms-office-documents/documents-resources/uri-content-for-ms-office-documents-in-course_x">MSOfficeDocuments, and <a href="http://pdn.pearson.com/pearson-learningstudio/apis/web-content-upload/web-content-upload-resources/uri-content-for-web-content-upload-item-in-course_x">WebContentUpload</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getTextMultimedias ($courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves a list of all the Text/Multimedia content items in a course.</li>
+		<li>The results are just the content item ID and a URL to the content itself, for which you can also use the <code>getTextMultimediasContent</code> method.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/textmultimedia/textmultimedia-resources/uri-text-multimedia-items-for-course_x">API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getTextMultimedia ($courseId, $textMediaId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves a single Text/Multimedia content items.</li>
+		<li>The result is just the content item ID and a URL to the content itself, for which you can also use the <code>getTextMultimediasContent</code> method.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/textmultimedia/textmultimedia-resources/uri-text-multimedia-items-for-course_x">API Documentation</a></li> 
+	</ul>
+
+	<br><pre><code class="language-php">getTextMultimediasContent ($courseId, $textMediaId [, $contentPath [, $useSourceDomain ] ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the actual content from a Text/Multimedia item. This will typically be HTML content.</li>
+		<li><code>$contentPath</code> is optional, if you happen to have the path to the content. For Text/Multimedia content this should always be <code>content.html</code>.</li>
+		<li>If <code>$useSourceDomain</code> is set to <code>true</code>, the API will prepend any URLs to LearningStudio-hosted assets (like images) with a fully-qualified hostname. Otherwise, the URLs will be relative.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/textmultimedia/textmultimedia-resources/uri-content-of-text-multimedia-item-in-course_x">API Documentation</a></li> 
+	</ul>
+
+
+	<br><pre><code class="language-php">getMsOfficeDocuments ($courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves a list of all the content items created from MS Office Documents in a course.</li>
+		<li>The results are just the content item ID and a URL to the content itself, for which you can also use the <code>getMsOfficeDocumentContent</code> method.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/ms-office-documents/documents-resources/uri-ms-office-documents-in-course_x">API Documentation</a></li> 
+	</ul>
+
+	<br><pre><code class="language-php">getMsOfficeDocument ($courseId, $msOfficeDocumentId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves a single MS Office Document content items.</li>
+		<li>The result is just the content item ID and a URL to the content itself, for which you can also use the <code>getTextMultimediasContent</code> method.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/ms-office-documents/documents-resources/uri-ms-office-documents-in-course_x">API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getMsOfficeDocumentContent ($courseId, $msOfficeDocumentId [, $contentPath ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the web-ready converted content from a MS Office Document content item. This will typically be HTML content.</li>
+		<li><code>$contentPath</code> is optional, and is typically found from the <code>getMsOfficeDocument</code> method - it's the last portion of the URL in the <code>contentUrl</code> property. Because this unique for each MSOfficeDocument content item, you can skip this parameter to have the method do it for you. </li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/ms-office-documents/documents-resources/uri-content-for-ms-office-documents-in-course_x">API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getMsOfficeDocumentOriginal ($courseId, $msOfficeDocumentId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the original MS Office Document that was uploaded to create this content item.</li>
+		<li>Use the binary-related methods of the <code>Response</code> object this method returns. The content will be binary and you will need to construct a file based off the item MIME type.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/ms-office-documents/documents-resources/uri-original-file-for-ms-office-documents-in-course_x">API Documentation</a></li> 
+	</ul>
+
+
+	<br><pre><code class="language-php">getWebContentUploads ($courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves a list of all the content items created from uploaded zip files of HTML pages.</li>
+		<li>The results are just the content item ID and a URL to the content itself, for which you can also use the <code>getWebContentUploadContent</code> method.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/web-content-upload/web-content-upload-resources/uri-web-content-upload-items-for-course_x">API Documentation</a></li> 
+	</ul>
+
+
+	<br><pre><code class="language-php">getWebContentUpload ($courseId, $webContentUploadId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves a single Web Content Upload content items.</li>
+		<li>The result is just the content item ID and a URL to the content itself, for which you can also use the <code>getWebContentUploadContent</code> method.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/ms-office-documents/documents-resources/uri-ms-office-documents-in-course_x">API Documentation</a></li> 
+	</ul>
+
+	<br><pre><code class="language-php">getWebContentUploadContent ($courseId, $webContentUploadId [, $contentPath ] )</code></pre>	
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the web-ready converted content from a Web Content Upload content item. This will typically be HTML content.</li>
+		<li><code>$contentPath</code> is optional, and is typically found from the <code>getWebContentUpload</code> method - it's the last portion of the URL in the <code>contentUrl</code> property. Because this unique for each WebContentUpload content item, you can skip this parameter to have the method do it for you. </li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/web-content-upload/web-content-upload-resources/uri-content-for-web-content-upload-item-in-course_x">API Documentation</a></li> 
+	</ul>
+
+
+	<br><pre><code class="language-php">getWebContentUploadOriginal ($courseId, $webContentUploadId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the original zip file that was uploaded to create this content item.</li>
+		<li>Use the binary-related methods of the <code>Response</code> object this method returns. The content will be binary and you will need to construct a file based off the item MIME type.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/web-content-upload/web-content-upload-resources/uri-original-file-for-web-content-upload-item-in-course_x">API Documentation</a></li> 
+	</ul>
+	
+	
+	
+	<br>
+	<a name="Threads"></a>
+	<h4>Threaded Discussions</h4>
+	
+	<pre><code class="language-php">getThreadedDiscussions ($courseId [, $useSourceDomain ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Retrieves a list of all the content items that are threaded discussions.</li>
+		<li>The main results are ID of the Threaded Discussion, and the introductory Text (HTML).</li>
+		<li>If <code>$useSourceDomain</code> is set to <code>true</code>, the API will prepend any URLs to LearningStudio-hosted assets (like images) with a fully-qualified hostname. Otherwise, the URLs will be relative.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-threads-for-course_x">API Documentation</a></li> 
+	</ul>
+
+
+	<br><pre><code class="language-php">getThreadedDiscussionTopics ($courseId, $threadId [, $useSourceDomain ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Retrieves the topics inside a threaded discussion. There is at least one topic, and there may be several. Responses will be posted to Topics.</li>
+		<li>The main results are ID of the Topic, it's title, and possibly a description (HTML).</li>
+		<li>If <code>$useSourceDomain</code> is set to <code>true</code>, the API will prepend any URLs to LearningStudio-hosted assets (like images) with a fully-qualified hostname. Otherwise, the URLs will be relative.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-topics-for-thread_x">API Documentation</a></li> 
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getThreadedDiscussionTopic ($courseId, $threadId, $topicId [, $useSourceDomain ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Retrieves a single topics from inside a threaded discussion. Responses will be posted to Topics.</li>
+		<li>The main results are ID of the Topic, it's title, and possibly a description (HTML).</li>
+		<li>If <code>$useSourceDomain</code> is set to <code>true</code>, the API will prepend any URLs to LearningStudio-hosted assets (like images) with a fully-qualified hostname. Otherwise, the URLs will be relative.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-topics-for-thread_x">API Documentation</a></li> 
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getThreadedDiscussionTopicHierarchy ($courseId, $threadId, $topicId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the complete tree of responses to a topic - including children and grandchildren</li>
+		<li>The API returns a <code>links</code> with URLs to the actual response data. You can parse the Response ID from these URLs and use them in the methods below where you find a <code>$responseId</code> parameter.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-response-hierarchy-for-topic_x">API Documentation</a></li> 
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getThreadedDiscussionResponseHierarchy ($courseId, $threadId, $topicId, $responseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the complete tree of responses to a response - including children and grandchildren.</li>
+		<li>The starting point for this API is a response to a topic or a response to a response. A possible use case is when you want to show a user all the responses to one of their posts.</li> 
+		<li>The API returns a <code>links</code> with URLs to the actual response data. You can parse the Response ID from these URLs and use them in the methods below where you find a <code>$responseId</code> parameter.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-response-hierarchy-for-topic_x">API Documentation</a></li> 
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getThreadedDiscussionResponseBranch ($courseId, $threadId, $topicId, $responseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+	<ul>
+		<li>Retrieves the tree of responses <i>from the topic</i> to the specified response ID.</li>
+		<li>Whereas <code>getThreadedDiscussionResponseHierarchy</code> starts from the response and retrieves its children, this method gets the response's ancestors. .</li> 
+		<li>The API returns a <code>links</code> with URLs to the actual response data. You can parse the Response ID from these URLs and use them in the methods below where you find a <code>$responseId</code> parameter.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-response-branch-for-response_x">API Documentation</a></li> 
+	</ul>
+
+	
+	<br><pre><code class="language-php">getThreadedDiscussionTopicUserViewResponses ($userId, $courseId, $threadId, $topicId [, $depth ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+
+	<ul>
+		<li>Retrieves a list of the responses to a topic and whether the specified user has read each post.</li>
+		<li>The results are flat, not hierarchical, but do include the title and body of the response (but not the posted date or author information).</li> 
+		<li><code>$depth</code> is an optional parameter that defines the maximum number of levels to traverse when you retrieve all responses under the topic. For example, specifying a depth of 1 only retrieves responses made directly to the topic.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-users-view-status-for-topic_x">API Documentation</a></li>
+	</ul>
+
+
+	<br><pre><code class="language-php">getThreadedDiscussionUserViewResponses ($userId, $courseId, $threadId, $topicId, $responseId [, $depth ])</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Retrieves a list of the responses <i>to a response</i> and whether the specified user has read each post.</li>
+		<li>The starting point for this API is a response to a topic or a response to a response.</li> 
+		<li>The results are flat, not hierarchical, but do include the title and body of the response (but not the posted date or author information).</li> 
+		<li><code>$depth</code> is an optional parameter that defines the maximum number of levels to traverse when you retrieve all responses under the topic. For example, specifying a depth of 1 only retrieves responses made directly to the specified response.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-user-view-status-for-response-to-response.html">API Documentation</a></li> 
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getThreadedDiscussionTopicResponseCount ($userId, $courseId, $threadId, $topicId [, $depth ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+
+	<ul>
+		<li>Calculates the total number of responses to a topic, including all children and grandchildren (unless limited by <code>$depth</code>).</li>
+		<li>Three properties are returned: <ul>
+			<li><code>totalResponseCount</code> is the total number of responses</li>
+			<li><code>unreadResponseCount</code> is the number of responses the specified user has <i>not</i> yet read.</li>
+			<li><code>personalResponseCount</code> is the number of responses posted by the specified user.</li>
+		</ul></li>
+		<li><code>$depth</code> is an optional parameter that defines the maximum number of levels to traverse when you retrieve all responses under the topic. For example, specifying a depth of 1 only retrieves responses made directly to the topic.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-response-counts-for-topic-by-user_x">API Documentation</a></li>
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getThreadedDiscussionResponseCount ($userId, $courseId, $threadId, $topicId, $responseId [, $depth ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Calculates the total number of responses to a response, including all children and grandchildren of that response (unless limited by <code>$depth</code>).</li>
+		<li>The starting point for this API is a response to a topic or a response to a response. A possible use case is when you want to show a user how many new responses there are to one of their posts.</li> 
+		<li>Three properties are returned: <ul>
+			<li><code>totalResponseCount</code> is the total number of responses</li>
+			<li><code>unreadResponseCount</code> is the number of responses the specified user has <i>not</i> yet read.</li>
+			<li><code>personalResponseCount</code> is the number of responses posted by the specified user.</li>
+		</ul></li>
+		<li><code>$depth</code> is an optional parameter that defines the maximum number of levels to traverse when you retrieve all responses under the response. For example, specifying a depth of 1 only retrieves responses made directly to the response.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-response-counts-for-response-by-user_x">API Documentation</a></li>
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getThreadedDiscussionResponseAuthor ($courseId, $threadId, $topicId, $responseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Retrieves the user ID, first and last name, and email address on record for the author of a response (post).</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-response-author_x">API Documentation</a></li>
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getThreadedDiscussionTopicResponseAndAuthorComposite ($courseId, $threadId, $topicId [, $depth ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>This is a composite API that returns the responses to a topic with both the post detail and the author detail.</li>
+		<li>The post information is the same as <code>getThreadedDiscussionResponse</code>.</li>
+		<li>The author information is the same as <code>getThreadedDiscussionResponseAuthor</code>, plus the user's role type (e.g, student, professor, etc).</li>
+		<li>The results are flat, not hierarchical. Either compare the response IDs to a hierarchical listing (e.g., from <code>getThreadedDiscussionTopicHierarchy</code>, or use the <code>$depth</code> parameter to limit the levels that are returned.</li>
+		<li><code>$depth</code> is an optional parameter that defines the maximum number of levels to traverse when you retrieve all responses under the topic. For example, specifying a depth of 1 only retrieves responses made directly to the topic.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-response-and-author-roster-information_x">API Documentation</a></li>
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getThreadedDiscussionResponseAndAuthorComposite ($courseId, $threadId, $topicId, $responseId [, $depth ] )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>This is a composite API that returns the responses to a response with both the post detail and the author detail.</li>
+		<li>The starting point for this API is a response to a topic or a response to a response. A possible use case is when you want to show a user only those responses to one of their posts.</li> 
+		<li>The post information is the same as <code>getThreadedDiscussionResponse</code>.</li>
+		<li>The author information is the same as <code>getThreadedDiscussionResponseAuthor</code>, plus the user's role type (e.g, student, professor, etc).</li>
+		<li>The results are flat, not hierarchical. Either compare the response IDs to a hierarchical listing (e.g., from <code>getThreadedDiscussionResponseHierarchy</code>, or use the <code>$depth</code> parameter to limit the levels that are returned.</li>
+		<li><code>$depth</code> is an optional parameter that defines the maximum number of levels to traverse when you retrieve all responses under the topic. For example, specifying a depth of 1 only retrieves responses made directly to the topic.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-response-and-author-roster-information_x">API Documentation</a></li>
+	</ul>
+	
+	
+	<br><pre><code class="language-php">getLastThreadedDiscussionResponse ($userId, $courseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>Retrieves the most recent response written the specified user.</li>
+		<li>A possible use case is to get this post, and then use <code>getThreadedDiscussionResponseHierarchy</code> to get all children to it, or <code>getThreadedDiscussionResponseCount</code> to check for any new responses to the user's last post.</li> 
+		<li><a href="http://pdn.pearson.com/uri-last-response-user">API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getThreadedDiscussionResponseReadStatus ($userId, $courseId, $threadId, $topicId, $responseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+
+	<ul>
+		<li>Retrieves the read status for a response.</li>
+		<li>LearningStudio tracks whether a user has read a post or not for all responses in a thread. If you are building a new threaded discussions user interface, you must update the read status using <code>updateThreadedDiscussionResponseReadStatus</code> when you display the post to a user.</li>
+		<li><a href="http://pdn.pearson.com/uri-read-status-response-user">API Documentation</a></li> 
+	</ul>
+	
+	
+	<br><pre><code class="language-php">updateThreadedDiscussionResponseReadStatus ($userId, $courseId, $threadId, $topicId, $responseId, $readStatus)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>Updates the read status for a response.</li>
+		<li>LearningStudio tracks whether a user has read a post or not for all responses in a thread. If you are building a new threaded discussions user interface, you must update the read status this method when you display the post to a user.</li>
+		<li><code>$readStatus</code> is a JSON-formatted payload that is <code>PUT</code> to the API.</li>
+		<li><a href="http://pdn.pearson.com/uri-read-status-response-user#requestbody">Sample Request Payload in the API Documentation</a></li> 
+	</ul>
+	
+	<br><pre><code class="language-php">getThreadedDiscussionResponse ($courseId, $threadId, $topicId, $responseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>This retrieves the detail of the specified response.</li>
+		<li>Data included is the ID, title, post body, links to information about the author, and the date the response was posted.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-responses-for-topic_x#example2">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">getThreadedDiscussionResponses ($courseId, $threadId, $topicId, $responseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth1">OAuth 1</span>
+		<span class="oauth2-all">OAuth 2 (All Role Types)</span>
+	</div> -->
+
+	<ul>
+		<li>This retrieves the responses to a response.</li>
+		<li>Data included is the ID, title, post body, links to information about the author, and the date the response was posted.</li> 
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-response-to-response_x">API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">createThreadedDiscussionResponse ($courseId, $threadId, $topicId [, $responseId ], $responseMessage )</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+
+	<ul>
+		<li>This method allows you to create a response in a thread.</li>
+		<li>If posting a response directly to the topic, set <code>$responseId</code> to <code>NULL</code>.</li>
+		<li><code>$responseMessage</code> is the JSON-formatted payload to send to the API.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-responses-for-topic_x#example3">Sample Payload in the API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">updateThreadedDiscussionResponse ($courseId, $threadId, $topicId, $responseId, $responseMessage)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-student">OAuth 2 As Student</span>
+	</div> -->
+	<ul>
+		<li>This method allows you to edit a response in a thread.</li>
+		<li><code>$responseMessage</code> is the JSON-formatted payload to send to the API. You may exclude any properties you aren't changing.</li>
+		<li>Note, students cannot change their posts - only users of type ADMIN, PROF, or TA may use this method.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-responses-for-topic_x#example4">Sample Payload in the API Documentation</a></li>
+	</ul>
+	
+	<br><pre><code class="language-php">deleteThreadedDiscussionResponse ($courseId, $threadId, $topicId, $responseId)</code></pre>
+	<!-- <div class="authmethods">
+		<span class="oauth2-teacher">OAuth 2 As Teacher</span>
+		<span class="oauth2-ta">OAuth 2 As TA</span>
+		<span class="oauth2-admin">OAuth 2 As Admnistrator</span>
+	</div> -->
+	<ul>
+		<li>This method allows you to delete a response in a thread and all the children of the response.</li>
+		<li>Note, students cannot delete their posts - only users of type ADMIN, PROF, or TA may use this method.</li>
+		<li><a href="http://pdn.pearson.com/pearson-learningstudio/apis/threads/threads-resources/uri-responses-for-topic_x">API Documentation</a></li>
+	</ul>
+	
+	
+	</article> 	
+	<footer>
+		&copy;2014 Pearson Education Inc. Libraries released under the <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache 2.0 License</a>. For help with these libraries or the APIs, please use the <a href="https://community.pdn.pearson.com" target="_blank">PDN Developer Community</a>.
+	</footer>
+        <script src="../assets/js/prism.js"></script>
+
+    </body>
+</html>

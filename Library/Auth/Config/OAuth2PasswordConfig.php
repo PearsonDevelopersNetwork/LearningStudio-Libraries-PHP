@@ -1,0 +1,120 @@
+<?php
+/*
+ * LearningStudio RESTful API Libraries 
+ * These libraries make it easier to use the LearningStudio Course APIs.
+ * Full Documentation is provided with the library. 
+ * 
+ * Need Help or Have Questions? 
+ * Please use the PDN Developer Community at https://community.pdn.pearson.com
+ *
+ * @category   LearningStudio Course APIs
+ * @author     Wes Williams <wes.williams@pearson.com>
+ * @author     Pearson Developer Services Team <apisupport@pearson.com>
+ * @copyright  2014 Pearson Education Inc.
+ * @license    http://www.apache.org/licenses/LICENSE-2.0  Apache 2.0
+ * @version    1.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace Auth\Config;
+
+/**
+ * Auth Service Config
+ * OAuth 2 Password Config functionality to store and retrieve applicationId,
+ * clientString, userName, passWord
+ * @author: Pradeep Patro <pradeep.patro@happiestminds.com>
+ * @version: v1.0
+ * @copyright: Pearson 2014
+ * @package: Auth
+ * @since: 12th Jun 2014
+ */
+class OAuth2PasswordConfig {
+
+  private $applicationId;
+  private $clientString;
+  private $userName;
+  private $passWord;
+
+  /**
+   * Accessor method for application id
+   * @access public
+   * @return string $applicationId ID for application
+   */
+  public function getApplicationId () {
+    return $this->applicationId;
+  }
+
+  /**
+   * Mutator method for application id
+   * @access public
+   * @param string $applicationId application id value to be set
+   */
+  public function setApplicationId ($applicationId) {
+    $this->applicationId = $applicationId;
+  }
+
+  /**
+   * Accessor method for client String
+   * @access public
+   * @return string $clientString Client String
+   */
+  public function getClientString () {
+    return $this->clientString;
+  }
+
+  /**
+   * Mutator method for client String
+   * @access public
+   * @param string $clientString Client String value to be set
+   */
+  public function setClientString ($clientString) {
+    $this->clientString = $clientString;
+  }
+
+  /**
+   * Accessor method for user name
+   * @access public
+   * @return string $userName User name
+   */
+  public function getUserName () {
+    return $this->userName;
+  }
+
+  /**
+   * Mutator method for user name
+   * @access public
+   * @param string $userName user name to be set
+   */
+  public function setUserName ($userName) {
+    $this->userName = $userName;
+  }
+
+  /**
+   * Accessor method for password
+   * @access public
+   * @return string $password Password
+   */
+  public function getPassWord () {
+    return $this->passWord;
+  }
+
+  /**
+   * Mutator method for password
+   * @access public
+   * @param string $passWord password value to be set
+   */
+  public function setPassWord ($passWord) {
+    $this->passWord = $passWord;
+  }
+}

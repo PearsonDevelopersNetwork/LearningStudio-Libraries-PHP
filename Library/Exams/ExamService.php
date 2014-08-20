@@ -1,0 +1,621 @@
+<?php
+/*
+ * LearningStudio RESTful API Libraries 
+ * These libraries make it easier to use the LearningStudio Course APIs.
+ * Full Documentation is provided with the library. 
+ * 
+ * Need Help or Have Questions? 
+ * Please use the PDN Developer Community at https://community.pdn.pearson.com
+ *
+ * @category   LearningStudio Course APIs
+ * @author     Wes Williams <wes.williams@pearson.com>
+ * @author     Pearson Developer Services Team <apisupport@pearson.com>
+ * @copyright  2014 Pearson Education Inc.
+ * @license    http://www.apache.org/licenses/LICENSE-2.0  Apache 2.0
+ * @version    1.0
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+namespace Exams;
+use Core as CoreLib;
+
+/**
+ * Exams Service API
+ * Service for interacting with the exams module of LearningStudio
+ * @package Exams
+ * @author: Pradeep Patro <pradeep.patro@happiestminds.com>
+ * @version: v1.0
+ * @copyright: Pearson 2014
+ * @since: 27 Jun 2014
+ */
+class ExamService extends CoreLib\BasicService {
+  // RELATION CONSTANTS
+  private $RELS_USER_COURSE_EXAM = "https://api.learningstudio.com/rels/user/course/exam";
+
+  /**
+   * Path Constants
+   * @access private
+   */
+  private $PATH_USERS_COURSES_ITEMS = "/users/%s/courses/%s/items";
+  private $PATH_USERS_COURSES_EXAMS = "/users/%s/courses/%s/exams";
+  private $PATH_USERS_COURSES_EXAMS_ = "/users/%s/courses/%s/exams/%s";
+  private $PATH_USERS_COURSES_EXAMS_ATTEMPTS = "/users/%s/courses/%s/exams/%s/attempts";
+  private $PATH_USERS_COURSES_EXAMS_ATTEMPTS_ = "/users/%s/courses/%s/exams/%s/attempts/%s";
+  private $PATH_USERS_COURSES_EXAMS_ATTEMPTS_SUMMARY = "/users/%s/courses/%s/exams/%s/attempts/%s/summary";
+  private $PATH_USERS_COURSES_EXAMDETAILS = "/users/%s/courses/%s/examDetails";
+  private $PATH_USERS_COURSES_EXAMDETAILS_ = "/users/%s/courses/%s/examDetails/%s";
+  private $PATH_COURSES_EXAMSCHEDULES = "/courses/%s/examSchedules";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS = "/users/%s/courses/%s/exams/%s/sections";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_QUESTIONS = "/users/%s/courses/%s/exams/%s/sections/%s/questions";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_TRUEFALSE_ = "/users/%s/courses/%s/exams/%s/sections/%s/trueFalseQuestions/%s";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_TRUEFALSE_CHOICES = "/users/%s/courses/%s/exams/%s/sections/%s/trueFalseQuestions/%s/choices";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_MULTIPLECHOICE_ = "/users/%s/courses/%s/exams/%s/sections/%s/multipleChoiceQuestions/%s";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_MULTIPLECHOICE_CHOICES = "/users/%s/courses/%s/exams/%s/sections/%s/multipleChoiceQuestions/%s/choices";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_MANYMULTIPLECHOICE_ = "/users/%s/courses/%s/exams/%s/sections/%s/manyMultipleChoiceQuestions/%s";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_MANYMULTIPLECHOICE_CHOICES = "/users/%s/courses/%s/exams/%s/sections/%s/manyMultipleChoiceQuestions/%s/choices";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_MATCHING_ = "/users/%s/courses/%s/exams/%s/sections/%s/matchingQuestions/%s";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_MATCHING_PREMISES = "/users/%s/courses/%s/exams/%s/sections/%s/matchingQuestions/%s/premises";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_MATCHING_CHOICES = "/users/%s/courses/%s/exams/%s/sections/%s/matchingQuestions/%s/choices";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_SHORT_ = "/users/%s/courses/%s/exams/%s/sections/%s/shortQuestions/%s";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_ESSAY_ = "/users/%s/courses/%s/exams/%s/sections/%s/essayQuestions/%s";
+  private $PATH_USERS_COURSES_EXAMS_SECTIONS_FILLINTHEBLANK_ = "/users/%s/courses/%s/exams/%s/sections/%s/fillintheblankQuestions/%s";
+  private $PATH_USERS_COURSES_EXAMS_ATTEMPTS_ANSWERS = "/users/%s/courses/%s/exams/%s/attempts/%s/answers";
+  private $PATH_USERS_COURSES_EXAMS_ATTEMPTS_ANSWERS_ = "/users/%s/courses/%s/exams/%s/attempts/%s/answers/%s";
+
+  private $PEARSON_EXAM_TOKEN = "Pearson-Exam-Token";
+  private $PEARSON_EXAM_PASSWORD = "Pearson-Exam-Password";
+
+  /**
+   * @ignore
+   */
+  protected $HttpStatusCode = array('OK' => 200,
+    'CREATED' => 201,
+    'NO_CONTENT' => 204,
+    'BAD_REQUEST' => 400,
+    'FORBIDDEN' => 403,
+    'NOT_FOUND' => 404,
+    'INTERNAL_ERROR' => 500,
+  );
+
+  /**
+   * @ignore
+   */
+  private $questionType = array('TRUE_FALSE' => 'trueFalse',
+    'MULTIPLE_CHOICE' => 'multipleChoice',
+    'MANY_MULTIPLE_CHOICE' => 'manyMultipleChoice',
+    'MATCHING' => 'matching',
+    'SHORT_ANSWER' => 'short',
+    'ESSAY' => 'essay',
+    'FILL_IN_THE_BLANK' => 'fillInTheBlank',
+  );
+	
+	/**
+	 * Provides name of service for identification purposes
+	 * 
+	 * @return Unique identifier for service
+	 */
+	protected function getServiceIdentifier() {
+		return "LS-Library-Exam-PHP-V1";
+	}
+	
+
+  /**
+   * @ignore
+   * For getting question type matched from the array
+   * @access private
+   * @param string $value question type from request
+   * @return string|bool matched question type from $questionType
+   */
+  private function questionTypeMatchesValue ($value) {
+    $questionTypeArray = array_map('strtolower', $this->questionType);
+    $value = strtolower($value);
+    if (in_array($value, $questionTypeArray)) {
+      $index = array_search($value, $questionTypeArray);
+      return $this->questionType[$index];
+    } else {
+      return NULL;
+    }
+  }
+
+  /**
+   * Retrieve all of a user's exams for a course with GET /users/{$userId}/courses/{$courses}/items
+   * using OAuth1 or OAuth2 as a student or teacher.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getAllExamItems ($userId, $courseId) {
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_ITEMS, $userId, $courseId);
+    $response = parent::_doGet($relativeUrl);
+    if($response->isError()) {
+      return $response;
+    }
+    $courseItemsJson = json_decode($response->getContent(), true);
+    $itemsArray = $courseItemsJson['items'];
+
+    $examsArray = array();
+    // Get Exams details
+    foreach ($itemsArray as $val) {
+      $linksArray = $val['links'];
+      foreach ($linksArray as $linksval) {
+        if ($this->RELS_USER_COURSE_EXAM == $linksval['rel'] ) {
+          array_push($examsArray, $val);
+        }
+      }
+    }
+    $itemChkArray = array('items' => $examsArray);
+    $response->setContent(json_encode($itemChkArray, true));
+    return $response;
+  }
+
+  /**
+   * Retrieve details for all exams for a course with GET /users/{$userId}/courses/{$courseId}/examDetails
+   * using OAuth1 or OAuth2 as a student, teacher, teaching assistant or administrator.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string|null $examId ID of exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExamDetails ($userId, $courseId, $examId = NULL) {
+    $relativeUrl = ($examId == NULL)
+                   ? sprintf($this->PATH_USERS_COURSES_EXAMDETAILS, $userId, $courseId)
+                   : sprintf($this->PATH_USERS_COURSES_EXAMDETAILS_, $userId, $courseId, $examId);
+    return parent::_doGet($relativeUrl);
+  }
+
+  /**
+   * Retrieve exam schedules for a course with GET /courses/{$courseId}/examschedules
+   * using OAuth1 or OAuth2 as a teacher, teaching assistant or administrator.
+   * @access public
+   * @param string $courseId ID of course.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExamSchedules ($courseId) {
+    $relativeUrl = sprintf($this->PATH_COURSES_EXAMSCHEDULES, $courseId);
+    return parent::_doGet($relativeUrl);
+  }
+
+  /**
+   * Retrieve all of a user's existing exams for a course with GET /users/{$userId}/courses/{$courseId}/exams
+   * using OAuth1 or OAuth2 as a student, teacher, teaching assistant or administrator.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of the course.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExistingExams ($userId, $courseId) {
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS, $userId, $courseId);
+    return parent::_doGet($relativeUrl);
+  }
+
+  /**
+   * Retrieve a user's exam for a course with GET /users/{$userId}/courses/{$courseId}/exams/{$examId}
+   * using OAuth1 or OAuth2 as a student, teacher, teaching assistant or administrator.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExistingExam ($userId, $courseId, $examId) {
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_, $userId, $courseId, $examId);
+    $response = parent::_doGet($relativeUrl);
+    return $response;
+  }
+
+  /**
+   * Creates an exam for a user in a course with POST /users/{$userId}/courses/{$courseId}/exams/{$examId}
+   * using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function createUserExam ($userId, $courseId, $examId) {
+    $response = $this->getExistingExam($userId, $courseId, $examId);
+    if ($response->getStatusCode() == $this->HttpStatusCode['NOT_FOUND']) {
+      $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_, $userId, $courseId, $examId);
+      $response = parent::_doPost($relativeUrl, '');
+    }
+    return $response;
+  }
+
+  /**
+   * Delete a users's exam in a course with DELETE /users/{$userId}/courses/{$courseId}/exams/{$examId}
+   * using OAuth1 or OAuth2 as a teacher, teaching assistant or administrator.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function deleteUserExam ($userId, $courseId, $examId) {
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_, $userId, $courseId, $examId);
+    $response = parent::_doDelete($relativeUrl);
+    return $response;
+  }
+
+  /**
+   * Create an exam attempt for a user in a course with
+   * POST /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts
+   * using OAuth1 or OAuth2 as student, teacher, teaching assistant or administrator.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @param string|null $examPassword Optional password from instructor.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function createExamAttempt ($userId, $courseId, $examId, $examPassword = NULL) {
+    $examHeaders = NULL;
+    if ($examPassword != NULL) {
+      $examHeaders = array($this->PEARSON_EXAM_PASSWORD => $examPassword);
+    }
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_ATTEMPTS, $userId, $courseId, $examId);
+    return parent::_doPost($relativeUrl, NULL, $examHeaders);
+  }
+
+  /**
+   * Retrieve a users's attempt of an exam in a course with
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts
+   * using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExamAttempts ($userId, $courseId, $examId) {
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_ATTEMPTS, $userId, $courseId, $examId);
+    return parent::_doGet($relativeUrl);
+  }
+
+  /**
+   * Retrieve a user's attempt of an exam in a course with
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts/{$attemptId}
+   * using OAuth1 or OAuth2 as a student, teacher, teaching assistant or administrator.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @param string $attemptId Id of the exam attempt.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExamAttempt ($userId, $courseId, $examId, $attemptId) {
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_ATTEMPTS_, $userId, $courseId, $examId, $attemptId);
+    return parent::_doGet($relativeUrl);
+  }
+
+  /**
+   * Retrieves and filters a user's current attempt of an exam in a course with
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts
+   * using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getCurrentExamAttempt ($userId, $courseId, $examId) {
+    $response = $this->getExamAttempts($userId, $courseId, $examId);
+    if ($response->isError()) {
+      return $response;
+    }
+    $jsonObj = json_decode($response->getContent(), true);
+    $attempts = array_key_exists('attempts', $jsonObj) ? $jsonObj['attempts'] : array();
+    $currentAttempt = NULL;
+    foreach($attempts as $attempt) {
+      $status = array_key_exists('isCompleted', $attempt) ? (bool)$attempt['isCompleted'] : false;
+      if (!$status) {
+        $currentAttempt = $attempt;
+      }
+    }
+
+    if (!is_null($currentAttempt)) {
+      $attempt = array('attempt' => $currentAttempt);
+      $response->setContent(json_encode($attempt, true));
+    } else {
+      $response->setStatusCode($this->HttpStatusCode['NOT_FOUND']);
+      $response->setContent('');
+    }
+    return $response;
+  }
+
+  /**
+   * Retrieve a summary of a user's attempt of an exam in a course with
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts/{$attempdId}/summary
+   * using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @param string $attemptId Id of the exam attempt.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExamAttemptSummary ($userId, $courseId, $examId, $attemptId) {
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_ATTEMPTS_SUMMARY, $userId, $courseId, $examId, $attemptId);
+    return parent::_doGet($relativeUrl);
+  }
+
+  /**
+   * Retrieve a user's current attempt or create new attempt of an exam in a course with
+   * getCurrentExamAttempt and createExamAttempt using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @param string|null $examPassword Optional password from instructor.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function startExamAttempt ($userId, $courseId, $examId, $examPassword = NULL) {
+    $response = $this->getCurrentExamAttempt($userId, $courseId, $examId);
+    if ($response->getStatusCode() == $this->HttpStatusCode['NOT_FOUND']) {
+      $response = $this->createExamAttempt($userId, $courseId, $examId, $examPassword);
+    }
+    return $response;
+  }
+
+  /**
+   * Retrieve sections of an user's exam in a course with
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/sections
+   * using OAuth1 or OAuth2 as a student, teacher, teaching assistant or administrator.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExamSections ($userId, $courseId, $examId) {
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS, $userId, $courseId, $examId);
+    return parent::_doGet($relativeUrl);
+  }
+
+  /**
+   * Retrieve details of questions for a section of a user's exam in a course with
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/sections/{$sectionId}/questions
+   * and getExamSectionQuestion using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @param string $sectionId ID of the section on the exam
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExamSectionQuestions ($userId, $courseId, $examId, $sectionId) {
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_QUESTIONS, $userId, $courseId, $examId, $sectionId);
+    $response = parent::_doGet($relativeUrl);
+    if ($response->isError()) {
+      return $response;
+    }
+    $jsonObj = json_decode($response->getContent(), true);
+    $questions = array_key_exists('questions', $jsonObj) ? $jsonObj['questions'] : array();
+    $sectionQuestions = array();
+
+
+    foreach ($questions as $question) {
+      $questionType = array_key_exists('type', $question) ? $question['type'] : '';
+      $questionId = array_key_exists('id', $question) ? $question['id'] : '';
+      $questionResponse = $this->getExamSectionQuestion($userId, $courseId, $examId, $sectionId, $questionType, $questionId);
+      if ($questionResponse->isError()) {
+        return $questionResponse;
+      }
+      $sectionQuestion = json_decode($questionResponse->getContent(), true);
+      $sectionQuestion['type'] = $questionType;
+      $sectionQuestion['id'] = $questionId;
+      $sectionQuestion['pointsPossible'] = $question['pointsPossible'];
+      array_push($sectionQuestions, $sectionQuestion);
+    }
+
+    $response->setContent(json_encode(array('questions' => $sectionQuestions)));
+    return $response;
+  }
+
+  /**
+   * Retrieve a user's answer for a question on a specific attempt of an exam in a course with
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts/{$attemptId}/answers/{$answerId}
+   * using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @param string $attemptId ID of the attempt on the exam.
+   * @param string $questionId ID of the question on the exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getQuestionAnswer ($userId, $courseId, $examId, $attemptId, $questionId) {
+    $response = $this->getExamAttempt($userId, $courseId, $examId, $attemptId);
+    if ($response->isError()) {
+      return $response;
+    }
+    $extraHeaders = $this->_get_exam_headers($response);
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_ATTEMPTS_ANSWERS_, $userId, $courseId, $examId, $attemptId, $questionId);
+    return parent::_doGet($relativeUrl, NULL, $extraHeaders);
+  }
+
+  /**
+   * @ignore
+   */
+  private function _get_section_urls ($userId, $courseId, $examId, $sectionId, $questionId, $qtype) {
+    $questionRelativeUrl = NULL;
+    $choicesRelativeUrl = NULL;
+    $premisesRelativeUrl = NULL;
+
+    if ($qtype == $this->questionType['TRUE_FALSE']) {
+      $questionRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_TRUEFALSE_, $userId, $courseId, $examId, $sectionId, $questionId);
+      $choicesRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_TRUEFALSE_CHOICES, $userId, $courseId, $examId, $sectionId, $questionId);
+    } else if ($qtype == $this->questionType['MULTIPLE_CHOICE']) {
+      $questionRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_MULTIPLECHOICE_, $userId, $courseId, $examId, $sectionId, $questionId);
+      $choicesRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_MULTIPLECHOICE_CHOICES, $userId, $courseId, $examId, $sectionId, $questionId);
+    } else if ($qtype == $this->questionType['MANY_MULTIPLE_CHOICE']) {
+      $questionRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_MANYMULTIPLECHOICE_, $userId, $courseId, $examId, $sectionId, $questionId);
+      $choicesRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_MANYMULTIPLECHOICE_CHOICES, $userId, $courseId, $examId, $sectionId, $questionId);
+    } else if ($qtype == $this->questionType['MATCHING']) {
+      $questionRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_MATCHING_, $userId, $courseId, $examId, $sectionId, $questionId);
+      $premisesRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_MATCHING_PREMISES, $userId, $courseId, $examId, $sectionId, $questionId);
+      $choicesRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_MATCHING_CHOICES, $userId, $courseId, $examId, $sectionId, $questionId);
+    } else if ($qtype == $this->questionType['SHORT_ANSWER']) {
+      $questionRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_SHORT_, $userId, $courseId, $examId, $sectionId, $questionId);
+    } else if ($qtype == $this->questionType['ESSAY']) {
+      $questionRelativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_SECTIONS_ESSAY_, $userId, $courseId, $examId, $sectionId, $questionId);
+    } else if ($qtype == $this->questionType['FILL_IN_THE_BLANK'] ) {
+      $questionRelativeUrl =sprintf( $this->PATH_USERS_COURSES_EXAMS_SECTIONS_FILLINTHEBLANK_, $userId, $courseId, $examId, $sectionId, $questionId);
+    }
+    return array($questionRelativeUrl, $choicesRelativeUrl, $premisesRelativeUrl);
+  }
+
+  /**
+   * Retrieve details of a question for a section of a user's exam in a course with
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/sections/{$sectionId}/{$questionType}Questions/{$questionId},
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/sections/{$sectionId}/{$questionType}Questions/{$questionId}/choices and
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/sections/{$sectionId}/{$questionType}Questions/{$questionId}/premises
+   * using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of course.
+   * @param string $examId ID of exam.
+   * @param string $sectionId ID of the section.
+   * @param string $questionType Type of question.
+   * @param string $questionId ID of the question on the exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function getExamSectionQuestion ($userId, $courseId, $examId, $sectionId, $questionType, $questionId) {
+    $qtype = $this->questionTypeMatchesValue($questionType);
+    if ($qtype == NULL) {
+      throw new \Exception('Invalid Question Type.');
+    }
+    $response = $this->getCurrentExamAttempt($userId, $courseId, $examId);
+    if ($response->isError()) {
+      return $response;
+    }
+    $extraHeaders = $this->_get_exam_headers($response);
+    list($questionRelativeUrl, $choicesRelativeUrl, $premisesRelativeUrl) = $this->_get_section_urls($userId, $courseId, $examId, $sectionId, $questionId, $qtype);
+    $response = parent::_doGet($questionRelativeUrl, NULL, $extraHeaders);
+    if ($response->isError()) {
+      return $response;
+    }
+
+    $question = json_decode($response->getContent(), true);
+    $details = array('question' => $question[$qtype . 'Question']);
+
+    if ($choicesRelativeUrl != NULL) {
+      $response = parent::_doGet($choicesRelativeUrl, NULL, $extraHeaders);
+      if ($response->isError()) {
+        return $response;
+      }
+      $choicesList = json_decode($response->getContent(), true);
+      $details['choices'] = array_key_exists('choices', $choicesList) ? $choicesList['choices'] : array();
+    }
+
+    if ($premisesRelativeUrl != NULL) {
+      $response = parent::_doGet($premisesRelativeUrl, NULL, $extraHeaders);
+      if ($response->isError()) {
+        return $response;
+      }
+      $premisesList = json_decode($response->getContent(), true);
+      $details['premises'] = array_key_exists('premises', $premisesList) ? $premisesList['premises'] : array();
+    }
+    $response->setContent(json_encode($details, true));
+    return $response;
+  }
+
+  /**
+   * Updates a user's answer for a question on a specific attempt of an exam in a course with
+   * GET /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts/{$attemptId}/answers/{$answerId},
+   * POST /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts/{$attemptId}/answers and
+   * PUT /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts/{$attemptId}/answers/{$answerId}
+   * using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of the course.
+   * @param string $examId ID of the exam.
+   * @param string $attemptId ID of the attempt on the exam.
+   * @param string $questionId ID of the question on the exam.
+   * @param string $answer Answer to the question on the exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function answerQuestion ($userId, $courseId, $examId, $attemptId, $questionId, $answer) {
+    $response = $this->getCurrentExamAttempt($userId, $courseId, $examId);
+    if ($response->isError()) {
+      return $response;
+    }
+    $extraHeaders = $this->_get_exam_headers($response);
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_ATTEMPTS_ANSWERS_, $userId, $courseId, $examId, $attemptId, $questionId);
+    $response = parent::_doGet($relativeUrl, NULL, $extraHeaders);
+    if ($response->isError()) {
+      if ($response->getStatusCode() == $this->HttpStatusCode['NOT_FOUND']) {
+        $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_ATTEMPTS_ANSWERS, $userId, $courseId, $examId, $attemptId);
+        $response = parent::_doPost($relativeUrl, $answer, $extraHeaders);
+      } else {
+        $response = parent::_doPut($relativeUrl, $answer, $extraHeaders);
+      }
+    }
+    return $response;
+  }
+
+  /**
+   * Updates a user's attempt of an exam in a course to complete with
+   * PUT /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts/{$attemptId}
+   * using OAuth2 as student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of the course.
+   * @param string $examId ID of the exam.
+   * @param string $attemptId ID of the attempt on the exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function completeExamAttempt ($userId, $courseId, $examId, $attemptId) {
+    $response = $this->getCurrentExamAttempt($userId, $courseId, $examId);
+    if ($response->isError()) {
+      return $response;
+    }
+    $extraHeaders = $this->_get_exam_headers($response);
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_ATTEMPTS_, $userId, $courseId, $examId, $attemptId);
+    $bodyContent = array( 'attempts' => array( 'isCompleted' => true ) );
+    $body = json_encode($bodyContent, true);
+    return parent::_doPut($relativeUrl, $body, $extraHeaders);
+  }
+
+  /**Delete a user's answer for a question on a specific attempt of an exam in a course with
+   * DELETE /users/{$userId}/courses/{$courseId}/exams/{$examId}/attempts/{$attemptId}/answers/{$answerId}
+   * using OAuth2 as a student.
+   * @access public
+   * @param string $userId ID of the user.
+   * @param string $courseId ID of the course.
+   * @param string $examId ID of the exam.
+   * @param string $attemptId ID of the attempt on the exam.
+   * @param string $questionId ID of the question on the exam.
+   * @return object $response Response class object with details of status and content.
+   */
+  public function deleteQuestionAnswer ($userId, $courseId, $examId, $attemptId, $questionId) {
+    $response = $this->getExamAttempt($userId, $courseId, $examId, $attemptId);
+    if ($response->isError()) {
+      return $response;
+    }
+    $extraHeaders = $this->_get_exam_headers($response);
+    $relativeUrl = sprintf($this->PATH_USERS_COURSES_EXAMS_ATTEMPTS_ANSWERS_, $userId, $courseId, $examId, $attemptId, $questionId);
+    return parent::_doDelete($relativeUrl, NULL, $extraHeaders);
+  }
+
+  /**
+   * @ignore
+   */
+  private function _get_exam_headers ($response) {
+    $attempt = json_decode($response->getContent(), true);
+    $attempt = $attempt['attempt'];
+    $examToken = array_key_exists('pearsonExamToken', $attempt) ?  $attempt['pearsonExamToken'] : '';
+    return array($this->PEARSON_EXAM_TOKEN => $examToken);
+  }
+}
